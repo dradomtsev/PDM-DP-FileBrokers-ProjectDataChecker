@@ -1,0 +1,62 @@
+
+/*	rmdir "y:\!TmP\" 	/s
+	rmdir "y:\ArT\" 	/s
+	rmdir "y:\BrB\" 	/s
+	rmdir "y:\BzH\" 	/s
+	rmdir "y:\DgT\" 	/s
+	rmdir "y:\DLV\" 	/s
+	rmdir "y:\FbO\" 	/s
+	rmdir "y:\GoL\" 	/s
+	rmdir "y:\IvK\" 	/s
+	rmdir "y:\KrR\" 	/s
+	rmdir "y:\LpK\" 	/s
+	rmdir "y:\PcH\" 	/s
+	rmdir "y:\RbO\" 	/s
+	rmdir "y:\RcH\" 	/s
+	rmdir "y:\ScN\" 	/s
+	rmdir "y:\ShE\" 	/s
+	rmdir "y:\StR\" 	/s
+	rmdir "y:\TmK\" 	/s
+	rmdir "y:\TpL\" 	/s
+	rmdir "y:\UnC\" 	/s
+	rmdir "y:\VdB\" 	/s
+	rmdir "y:\VLK\" 	/s
+	rmdir "y:\VsS\" 	/s
+	rmdir "y:\ZaB\" 	/s
+	rmdir "y:\ZbL\" 	/s
+	rmdir "y:\ZrC\" 	/s */
+
+robocopy "t:\!TmP" 	"y:\!TmP" 	/xf t:\!TmP\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\ArT" 	"y:\ArT" 	/xf t:\ArT\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\BrB" 	"y:\BrB" 	/xf t:\BrB\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\BzH" 	"y:\BzH" 	/xf t:\BzH\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\DgT" 	"y:\DgT" 	/xf t:\DgT\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\DLV" 	"y:\DLV" 	/xf t:\DLV\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\FbO" 	"y:\FbO" 	/xf t:\FbO\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\GoL" 	"y:\GoL" 	/xf t:\GoL\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\IvK" 	"y:\IvK" 	/xf t:\IvK\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\KrR" 	"y:\KrR" 	/xf t:\KrR\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\LpK" 	"y:\LpK" 	/xf t:\LpK\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\PcH" 	"y:\PcH" 	/xf t:\PcH\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\RbO" 	"y:\RbO" 	/xf t:\RbO\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\RcH" 	"y:\RcH" 	/xf t:\RcH\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\ScN" 	"y:\ScN" 	/xf t:\ScN\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\ShE" 	"y:\ShE" 	/xf t:\ShE\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\StR" 	"y:\StR" 	/xf t:\StR\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\TmK" 	"y:\TmK" 	/xf t:\TmK\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\TpL" 	"y:\TpL" 	/xf t:\TpL\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\UnC" 	"y:\UnC" 	/xf t:\UnC\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\VdB" 	"y:\VdB" 	/xf t:\VdB\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\VLK" 	"y:\VLK" 	/xf t:\VLK\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\VsS" 	"y:\VsS" 	/xf t:\VsS\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+
+robocopy "t:\ZaB" 	"y:\ZaB" 	/xf t:\ZaB\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\ZbL" 	"y:\ZbL" 	/xf t:\ZbL\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
+robocopy "t:\ZrC" 	"y:\ZrC" 	/xf t:\ZrC\PlcHldr_NotDelbyRobocopy.txt 	/zb /s /sl /dcopy:T  /move /minage:20180128 /minlad:20180128 /r:2 /w:5
