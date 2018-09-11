@@ -295,10 +295,10 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 	std::shared_ptr<sql::PreparedStatement> pstmtWrite;
 	try
 	{
-		std::string sFileSize, sTime_create, sTime_write;
+		std::string sFileSize;// , sTime_create, sTime_write;
 		sFileSize.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileSize.QuadPart));
-		sTime_create.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_create));
-		sTime_write.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_write));
+		//sTime_create.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_create));
+		//sTime_write.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_write));
 
 		//std::basic_string<TCHAR> stPathFilename;
 		//stPathFilename.insert(0, fpInst->sFileInfoInst.sFileDirPath);
@@ -306,7 +306,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		//std::string sFileDirPathTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(stPathFilename);
 		std::string sFileNameTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileName);
 
-		std::string stMySQLST_Insert ("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+		std::string stMySQLST_Insert ("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16, field_17) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableFiles.stMySQLTable_name);
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_0"), std::string("field_0").length(), stMySQLTableFiles.stMySQLTable_fields.at(0));
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_1"), std::string("field_1").length(), stMySQLTableFiles.stMySQLTable_fields.at(1));
@@ -326,6 +326,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_14"), std::string("field_14").length(), stMySQLTableFiles.stMySQLTable_fields.at(14));
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_15"), std::string("field_15").length(), stMySQLTableFiles.stMySQLTable_fields.at(15));
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_16"), std::string("field_16").length(), stMySQLTableFiles.stMySQLTable_fields.at(16));
+		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_17"), std::string("field_17").length(), stMySQLTableFiles.stMySQLTable_fields.at(17));
 
 		pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert));
 		pstmtWrite->setString	(1, sFileNameTMP);
@@ -347,6 +348,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 
 		pstmtWrite->setInt64	(16, fpInst->sFileInfoInst.sFileCAWTime.i64Time_create);
 		pstmtWrite->setInt64	(17, fpInst->sFileInfoInst.sFileCAWTime.i64Time_write);
+		pstmtWrite->setInt64	(18, fpInst->sFileInfoInst.sFileCAWTime.i64Time_access);
 
 		pstmtWrite->execute();
 		pstmtWrite->close();

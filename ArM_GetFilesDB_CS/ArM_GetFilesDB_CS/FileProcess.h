@@ -43,16 +43,16 @@ private:
 		INT iChkStageDR		= -1;
 		INT iChkSubSystemDB = -1;
 		INT iChkDataTypeDB	= -1;
-		LARGE_INTEGER sFileSize;
-		std::string sNumberofLinks;
-		FileCAWTime sFileCAWTime;
+		LARGE_INTEGER sFileSize		= { 0 };
+		//std::string sNumberofLinks;
+		FileCAWTime sFileCAWTime	= { 0 };
 	} sFileInfoInst;
 	std::basic_string <char>::size_type iIndex;
 	std::basic_string <char>::size_type npos;
 	std::vector<std::basic_string<TCHAR>> vstExistExtens;
 	std::vector<std::basic_string<TCHAR>> vstExistDirs;
-	std::vector<std::basic_string<TCHAR>> vstExistDirsRoot;
-	std::basic_string<TCHAR> stDirPathforNameCheck;
+	//std::vector<std::basic_string<TCHAR>> vstExistDirsRoot;
+	//std::basic_string<TCHAR> stDirPathforNameCheck;
 protected:
 public:
 	//friend class UI;
@@ -68,7 +68,7 @@ public:
 	DWORD CloseMySQLConect		();
 	
 	DWORD IterDirs				(std::basic_string<TCHAR> stWorkDir);
-	DWORD IterObjects			(std::basic_string<TCHAR> twrkDir, std::basic_string<TCHAR> twrkDirName, int iCounter);
+	DWORD IterObjects			(std::basic_string<TCHAR> twrkDir,const std::basic_string<TCHAR> &twrkDirName, int iCounter);
 	DWORD IterProcessFiles		(HANDLE hFileDataFindFirst, std::basic_string<TCHAR> twrkDirtemp, std::basic_string<TCHAR> twrkDirName);
 
 	DWORD GetFileOwnerName		(HANDLE hFile, std::basic_string<TCHAR> sFileName);
@@ -77,8 +77,8 @@ public:
 	DWORD GetFileInfobyName		();
 	DWORD GetFileInfobyFolder	();
 	DWORD ChangeFolderView		();
-	DWORD ChkMask				(std::basic_string<TCHAR> sFileName);
-	DWORD ChkCyrillic			(std::basic_string<TCHAR> sFileName);
+	DWORD ChkMask				(const std::basic_string<TCHAR> &sFileName);
+	DWORD ChkCyrillic			(const std::basic_string<TCHAR> &sFileName);
 	DWORD ChkProjectDB			();
 	DWORD ChkProjectDR			();
 	DWORD Chk—ompanyDB			();

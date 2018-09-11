@@ -73,8 +73,10 @@ DWORD Logger::CreateMySQLLog()
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("CreateMySQLLog(TRUNCATE TABLE errors) "), _T("."), dwErrorCode);
 		}
 	}
+	dwErrorCode = GetLastError();
+	return dwErrorCode;
 };
-DWORD Logger::PrepareTXTLOG(char* cAddString1, std::string sState1, char* cAddString2, int iErrorCode, char* cAddString3, std::string sState2)
+DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::string &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::string &sState2)
 {
 	DWORD dwErrorCode = -1;
 	this->sBuff.insert(0, cAddString1);
@@ -92,7 +94,7 @@ DWORD Logger::PrepareTXTLOG(char* cAddString1, std::string sState1, char* cAddSt
 	this->sBuff.clear();
 	return dwErrorCode;
 };
-DWORD Logger::PrepareTXTLOG(char* cAddString1, std::basic_string<TCHAR> sState1, char* cAddString2, int iErrorCode, char* cAddString3, std::string sState2)
+DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::string &sState2)
 {
 	DWORD dwErrorCode = -1;
 	std::string sFileTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1);
@@ -112,7 +114,7 @@ DWORD Logger::PrepareTXTLOG(char* cAddString1, std::basic_string<TCHAR> sState1,
 	this->sBuff.clear();
 	return dwErrorCode;
 };
-DWORD Logger::PrepareTXTLOG(char* cAddString1, std::basic_string<TCHAR> sState1, char* cAddString2, int iErrorCode, char* cAddString3, std::basic_string<TCHAR> sState2)
+DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::basic_string<TCHAR> &sState2)
 {
 	DWORD dwErrorCode = -1;
 	std::string sFuncTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1);
@@ -229,9 +231,10 @@ DWORD Logger::WriteToTXTLog()
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("WriteToTXTLog()->WriteFile(asynchronous write)"), _T("."), dwErrorCode);
 			return dwErrorCode;
 		}
-		else this->sBuff.clear();
+		//else this->sBuff.clear();
 		CloseHandle(this->hFile);
 	}
+	dwErrorCode = GetLastError();
 	return dwErrorCode;
 };
 DWORD Logger::WriteToMySQLLog()

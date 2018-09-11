@@ -13,9 +13,9 @@ public:
 	static  Logger* GetLogInstance();
 	DWORD Logger::CreateTXTLog();
 	DWORD Logger::CreateMySQLLog();
-	DWORD Logger::PrepareTXTLOG(char* cAddString1, std::string sState1, char* cAddString2, int iErrorCode, char* cAddString3, std::string sState2);
-	DWORD Logger::PrepareTXTLOG(char* cAddString1, std::basic_string<TCHAR> sState1, char* cAddString2, int iErrorCode, char* cAddString3, std::string sState2);
-	DWORD Logger::PrepareTXTLOG(char* cAddString1, std::basic_string<TCHAR> sState1, char* cAddString2, int iErrorCode, char* cAddString3, std::basic_string<TCHAR> sState2);
+	DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::string &sState1,				char* cAddString2, int iErrorCode, char* cAddString3, const std::string &sState2);
+	DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::string &sState2);
+	DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::basic_string<TCHAR> &sState2);
 	DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::string sState1, int iErrorCode, std::string sState2);
 	DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::string sState1, int iErrorCode, std::basic_string<TCHAR> sState2);
 	DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::basic_string<TCHAR> sState1, int iErrorCode, std::basic_string<TCHAR> sState2);

@@ -7,6 +7,7 @@
 
 #include "targetver.h"
 
+#define _ITERATOR_DEBUG_LEVEL 0
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #define _CRTDBG_MAP_ALLOC  
 // Windows Header Files:

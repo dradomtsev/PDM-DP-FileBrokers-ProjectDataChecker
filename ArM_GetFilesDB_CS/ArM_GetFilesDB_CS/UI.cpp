@@ -252,8 +252,8 @@ DWORD UI::InitbyINI()
 	std::size_t nStartFrom = 0;
 	std::size_t nLocCRLF = 0;
 	std::basic_string<TCHAR> stCRLF = _T("\r\n");
-	std::basic_string<TCHAR> stTir = _T("-");
-	std::basic_string<TCHAR> stComa = _T(";");
+	//std::basic_string<TCHAR> stTir = _T("-");
+	//std::basic_string<TCHAR> stComa = _T(";");
 	std::size_t nLoc = 0;
 	
 	SetLastError(ERROR_SUCCESS);
@@ -266,277 +266,277 @@ DWORD UI::InitbyINI()
 			stINIbuffer.erase(nStartFrom, nLocCRLF + 2);
 		}
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstFolderstoParse.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
 			
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstFolderstoIgnore.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			stChkStartDateTime.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			stChkEndDateTime.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstRootFolders.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstErrorsTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstErrorsTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
 
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstExtensTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstExtensTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstFilesTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstFilesTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstFoldersTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstFoldersTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstUsersTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstUsersTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstProjectsTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstProjectsTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstCompaniesTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstCompaniesTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstRolesTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstRolesTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstSubsystemsTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstSubsystemsTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstDatatypesTableName.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstDatatypesTableFields.push_back(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)));
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
@@ -545,44 +545,44 @@ DWORD UI::InitbyINI()
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstMySQl_Hostname.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstMySQl_Login.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstMySQl_Password.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstMySQl_DefSchema.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
@@ -591,55 +591,55 @@ DWORD UI::InitbyINI()
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstChk_FileMaskCommon.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstChk_Cyrillic.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstChk_Company.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find(stComa, nStartFrom);
+			nLoc = vstINI[0].find(';', nStartFrom);
 			vstChk_Role.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
 		//
-		nLoc = vstINI[0].find_first_of(stTir, nStartFrom);
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
 		vstINI[0].erase(nStartFrom, nLoc + 1);
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = vstINI[0].find_first_of(stComa, nStartFrom);
+			nLoc = vstINI[0].find_first_of(';', nStartFrom);
 			vstChk_Stage.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
 			vstINI[0].erase(nStartFrom, nLoc + 1);
 		}
@@ -669,21 +669,21 @@ DWORD UI::ConvertDateTime()
 {
 	DWORD dwErrorcode;
 	std::size_t nStartFrom = 0;
-	std::basic_string<TCHAR> stComa = _T(":");
+	//std::basic_string<TCHAR> stComa = _T(":");
 	std::size_t nLoc = 0;
 
-	LPSYSTEMTIME lpSystemTime;
+	//LPSYSTEMTIME lpSystemTime;
 
 	while (nLoc != std::basic_string<TCHAR>::npos)
 	{
-		nLoc = stChkStartDateTime.find(stComa, nStartFrom);
+		nLoc = stChkStartDateTime.find(':', nStartFrom);
 		vstChkStartDateTime.push_back(stChkStartDateTime.substr(nStartFrom, (nLoc - nStartFrom)));
 		stChkStartDateTime.erase(nStartFrom, nLoc + 1);
 	}
 	nLoc = 0;
 	//while (nLoc != std::basic_string<TCHAR>::npos)
 	//{
-	//	nLoc = stChkEndDateTime.find(stComa, nStartFrom);
+	//	nLoc = stChkEndDateTime.find(':', nStartFrom);
 	//	vstChkEndDateTime.push_back(stChkEndDateTime.substr(nStartFrom, (nLoc - nStartFrom)));
 	//	stChkEndDateTime.erase(nStartFrom, nLoc + 1);
 	//}

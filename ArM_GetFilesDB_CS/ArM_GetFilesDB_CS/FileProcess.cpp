@@ -2,8 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "stdafx.h"
 
-FileProcess::FileProcess() : curSysTime(), curFileTime(), sFileInfoInst() 
+FileProcess::FileProcess() : curSysTime(), curFileTime(), tStartChkPeriod(), tEndChkPeriod(), sFileInfoInst()
 {
+	//vstExistDirs.push_back(_T(""));
+	//vstExistExtens.push_back(_T(""));
+	
 	iIndex = 0;
 	npos = -1;
 };
@@ -18,6 +21,7 @@ DWORD FileProcess::InitReviewPeriod()
 	try
 	{
 		bStatus = SystemTimeToFileTime(&UI::GetUIInst()->stStartChkPeriod, &this->tStartChkPeriod);
+		bStatus = FALSE;
 		//std::cout << bStatus;
 		bStatus = SystemTimeToFileTime(&UI::GetUIInst()->stEndChkPeriod, &this->tEndChkPeriod);
 		//GetSystemTimeAsFileTime(&this->curFileTime); //Time point to check file age from
@@ -31,7 +35,7 @@ DWORD FileProcess::InitReviewPeriod()
 		//this->curFileTime.dwHighDateTime = (DWORD)(qwResult >> 32);
 
 		dwErrorCode = GetLastError();
-		if (dwErrorCode = ERROR_INVALID_PARAMETER)
+		if (dwErrorCode == ERROR_INVALID_PARAMETER)
 		{
 			SetLastError(ERROR_SUCCESS);
 			dwErrorCode = ERROR_SUCCESS;
@@ -157,12 +161,12 @@ DWORD FileProcess::IterDirs(std::basic_string<TCHAR> stWorkDir)
 	}
 	return  dwErrorCode;
 }
-DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir, std::basic_string<TCHAR> twrkDirName, int iCounter)
+DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic_string<TCHAR> &twrkDirName, int iCounter)
 {
 	WIN32_FIND_DATA fdFileData = { 0 };
 	HANDLE hFileDataFindFirst = nullptr;
 	HANDLE hFileReparse = nullptr;
-	BY_HANDLE_FILE_INFORMATION hfiFileReparse;
+	//BY_HANDLE_FILE_INFORMATION hfiFileReparse;
 	SetLastError(ERROR_SUCCESS);
 	DWORD dwErrorCode = -1;
 	BOOL bStatus = FALSE;
@@ -372,14 +376,23 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir, std::basic_stri
 						//this->IterProcessFiles(hFileDataFindFirst, twrkDirtemp, twrkDirName);
 					//else
 					//{
-
-						int iStartLater = CompareFileTime(&this->tStartChkPeriod, &fdFileData.ftLastAccessTime);
-						int iEndEarlier = CompareFileTime(&this->tEndChkPeriod, &fdFileData.ftLastAccessTime);
-						//std::cout << std::endl << iStartLater << "________" << iEndEarlier;
-						if (iStartLater == -1 && iEndEarlier == 1) //CompareFileTime(&this->curFileTime, &fdFileData.ftCreationTime) && CompareFileTime(&this->curFileTime, &fdFileData.ftLastAccessTime) && 
-						{
-							this->IterProcessFiles(hFileDataFindFirst, twrkDirtemp, twrkDirName);
-						}
+					int iMaxTimeFlag	= CompareFileTime(&fdFileData.ftCreationTime, &fdFileData.ftLastWriteTime);
+					switch (iMaxTimeFlag)
+					{
+					case -1:
+						this->curFileTime = fdFileData.ftLastWriteTime;
+					case 0:
+						this->curFileTime = fdFileData.ftCreationTime;
+					case 1:
+						this->curFileTime = fdFileData.ftCreationTime;
+					}
+					int iStartLater		= CompareFileTime(&this->tStartChkPeriod, &this->curFileTime);
+					int iEndEarlier		= CompareFileTime(&this->tEndChkPeriod, &this->curFileTime);
+					//std::cout << std::endl << iStartLater << "________" << iEndEarlier;
+					if (iStartLater == -1 && iEndEarlier == 1) //CompareFileTime(&this->curFileTime, &fdFileData.ftCreationTime) && CompareFileTime(&this->curFileTime, &fdFileData.ftLastWriteTime)
+					{
+						this->IterProcessFiles(hFileDataFindFirst, twrkDirtemp, twrkDirName);
+					}
 					//}
 				}
 				else
@@ -534,8 +547,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		// Get file info
 		if (hFile != INVALID_HANDLE_VALUE)
 		{
-			this->sFileInfoInst.sFileDirName = twrkDirName;
-			this->sFileInfoInst.sFileDirPath = twrkDirtemp;
+			this->sFileInfoInst.sFileDirName = std::move(twrkDirName);
+			this->sFileInfoInst.sFileDirPath = std::move(twrkDirtemp);
 
 			this->sFileInfoInst.sFileExtension = PathFindExtension(this->sFileInfoInst.sFileName.c_str());
 
@@ -605,10 +618,18 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 	// Write to table "Folders"
 	try
 	{
-		if (!(std::find(this->vstExistDirs.begin(), this->vstExistDirs.end(), this->sFileInfoInst.sFileDirPath) != this->vstExistDirs.end()))
+		if (this->vstExistDirs.empty())
 		{
-			this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPath);
+			this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPathChngView);
 			DBProcess::dbProcInstance()->DBWriteFolders(this);
+		}
+		else
+		{
+			if (!(std::find(this->vstExistDirs.begin(), this->vstExistDirs.end(), this->sFileInfoInst.sFileDirPathChngView.c_str()) != this->vstExistDirs.end()))
+			{
+				this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPathChngView);
+				DBProcess::dbProcInstance()->DBWriteFolders(this);
+			}
 		}
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
@@ -618,15 +639,15 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		switch (dwErrorCode)
 		{
 		case ERROR_SUCCESS:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPath);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPathChngView);
 			break;
 		default:
 			FindClose(hFileDataFindFirst);
 			if (hFile != nullptr)
 				CloseHandle(hFile);
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterObjects(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPath);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in writing to TABLE folders", "Function->IterObjects(DBWriteFolders())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileDirPath);
-			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFolders()"), (LPTSTR)this->sFileInfoInst.sFileDirPath.c_str(), dwErrorCode);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterObjects(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPathChngView);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in writing to TABLE folders", "Function->IterObjects(DBWriteFolders())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileDirPathChngView);
+			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFolders()"), (LPTSTR)this->sFileInfoInst.sFileDirPathChngView.c_str(), dwErrorCode);
 		}
 	}
 
@@ -634,10 +655,25 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 	try
 	{
 		std::transform(this->sFileInfoInst.sFileExtension.begin(), this->sFileInfoInst.sFileExtension.end(), this->sFileInfoInst.sFileExtension.begin(), ::tolower);
-		if (!(std::find(this->vstExistExtens.begin(), this->vstExistExtens.end(), this->sFileInfoInst.sFileExtension) != this->vstExistExtens.end()))
+		if (this->vstExistExtens.empty())
 		{
 			this->vstExistExtens.push_back(this->sFileInfoInst.sFileExtension);
 			DBProcess::dbProcInstance()->DBWriteExtensions(this);
+		}
+		else
+		{
+			//std::basic_string<TCHAR> stFormatStr(MAX_PATH, 0);
+			//stFormatStr = this->sFileInfoInst.sFileExtension;
+			//stFormatStr = *this->vstExistExtens.begin();
+			//std::wcout << std::left << stFormatStr << std::endl;
+			//stFormatStr.clear();
+			
+			auto result = std::find(this->vstExistExtens.cbegin(), this->vstExistExtens.cend(), this->sFileInfoInst.sFileExtension);
+			if (result == this->vstExistExtens.cend())
+			{
+					this->vstExistExtens.push_back(this->sFileInfoInst.sFileExtension.c_str());
+					DBProcess::dbProcInstance()->DBWriteExtensions(this);
+			}
 		}
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
@@ -683,8 +719,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		}
 	}
 	
-	if (hFile != nullptr)
-		CloseHandle(hFile);
+	//if (hFile != nullptr)
+	//	CloseHandle(hFile);
 
 	return dwErrorCode;
 };
@@ -824,9 +860,9 @@ DWORD FileProcess::GetFileOwnerName(HANDLE hFile, std::basic_string<TCHAR> sFile
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(LookupAccountSid()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in Look up Account Sid", "Function->LookupAccountSid(())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
 			LocalFree(pSD);
-			bRtnBool = HeapDestroy(hProcHeap);
-			bRtnBool = FALSE;
-			bRtnBool = HeapDestroy(hProcHeapT);
+			HeapDestroy(hProcHeap);
+			//bRtnBool = FALSE;
+			HeapDestroy(hProcHeapT);
 			return dwErrorCode;
 		}
 	}
@@ -836,7 +872,7 @@ DWORD FileProcess::GetFileOwnerName(HANDLE hFile, std::basic_string<TCHAR> sFile
 		//std::string sFileAcctName(AcctName);
 		//std::basic_string<TCHAR> wsFileDomainName(DomainName);
 		//std::string sFileDomainName(wsFileDomainName.begin(), wsFileDomainName.end());
-		this->sFileInfoInst.sFileOwnerName = wsFileAcctName;
+		this->sFileInfoInst.sFileOwnerName = std::move(wsFileAcctName);
 		//this->sFileInfoInst.sFileOwnerName = sFileDomainName + "\\" + sFileAcctName;
 		dwErrorCode = -1;
 		LocalFree(pSD);
@@ -952,8 +988,6 @@ DWORD FileProcess::GetFileInfobyName()
 	std::basic_string<TCHAR> sFile_Info(this->sFileInfoInst.sFileName);
 	std::vector<std::basic_string<TCHAR>> vstFile_Info;
 	std::vector<std::basic_string<TCHAR>> vstFile_TMP;
-	std::basic_string<TCHAR> stTir = _T("-");
-	std::basic_string<TCHAR> stComa = _T(".");
 	std::size_t nStartFrom = 0;
 	std::size_t nLoc = 0;
 
@@ -962,7 +996,7 @@ DWORD FileProcess::GetFileInfobyName()
 	{
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = sFile_Info.find(stTir, nStartFrom);
+			nLoc = sFile_Info.find('-', nStartFrom);
 			vstFile_Info.push_back(sFile_Info.substr(nStartFrom, (nLoc - nStartFrom)));
 			sFile_Info.erase(nStartFrom, nLoc + 1);
 		}
@@ -976,7 +1010,7 @@ DWORD FileProcess::GetFileInfobyName()
 
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = this->sFileInfoInst.sFile_DatatypebyName.find(stComa, nStartFrom);
+			nLoc = this->sFileInfoInst.sFile_DatatypebyName.find('.', nStartFrom);
 			vstFile_TMP.push_back(this->sFileInfoInst.sFile_DatatypebyName.substr(nStartFrom, (nLoc - nStartFrom)));
 			this->sFileInfoInst.sFile_DatatypebyName.erase(nStartFrom, nLoc + 1);
 		}
@@ -1009,44 +1043,42 @@ DWORD FileProcess::GetFileInfobyName()
 DWORD FileProcess::GetFileInfobyFolder()
 {
 	std::basic_string<TCHAR> sFile_Info;
-	BOOL bFindStatus = FALSE;
 	std::size_t nLoc = 0;
 	DWORD dwErrorCode;
-	std::map <std::basic_string<TCHAR>, std::basic_string<TCHAR>> mRootFolders = { {_T("03-Published"), _T("P:")},{ _T("Resources"), _T("R:") },{ _T("02-Shared"), _T("S:") },{ _T("01-WorkInProgress"), _T("W:") }};
+	bool bFindStatus = FALSE;
+	//auto itvstFileName = UI::GetUIInst()->vstRootFolders.begin();
+	//std::map <std::basic_string<TCHAR>, std::basic_string<TCHAR>> mRootFolders = { {_T("03-Published"), _T("P:")},{ _T("Resources"), _T("R:") },{ _T("02-Shared"), _T("S:") },{ _T("01-WorkInProgress"), _T("W:") }};
 	try
 	{
 		sFile_Info = this->sFileInfoInst.sFileDirPath;
 		//std::wcout << sFile_Info;
+		//for (itvstFileName; itvstFileName != UI::GetUIInst()->vstRootFolders.end(); ++itvstFileName)
+		//for (UI::GetUIInst()->itRootFolders = UI::GetUIInst()->vstRootFolders.begin(); UI::GetUIInst()->itRootFolders != UI::GetUIInst()->vstRootFolders.end(); ++UI::GetUIInst()->itRootFolders)
+		//{
+		//	nLoc = sFile_Info.find(itvstFileName->c_str(), 0);
+		//	if (nLoc != std::basic_string<TCHAR>::npos)
+		//	{
+		//		sFile_Info.erase(0, nLoc + 1);
+		//		bFindStatus = TRUE;
 
-		for (UI::GetUIInst()->itRootFolders = UI::GetUIInst()->vstRootFolders.begin(); UI::GetUIInst()->itRootFolders != UI::GetUIInst()->vstRootFolders.end(); ++UI::GetUIInst()->itRootFolders)
-		{
-			nLoc = sFile_Info.find(UI::GetUIInst()->itRootFolders->c_str(), 0);
-			if (nLoc != std::basic_string<TCHAR>::npos)
-			{
-				sFile_Info.erase(0, nLoc + 1);
-				bFindStatus = TRUE;
-
-				//this->sFileInfoInst.sFileDirPath = sFile_Info;
-				//this->sFileInfoInst.sFileDirPath.replace(this->sFileInfoInst.sFileDirPath.find(UI::GetUIInst()->itRootFolders->c_str()), UI::GetUIInst()->itRootFolders->length(), mRootFolders.at(UI::GetUIInst()->itRootFolders->c_str()));
-			}
-			else
-				continue;
-			if (bFindStatus != FALSE)
-				break;
-		}
-		nLoc = 0;
-		//std::wcout << this->sFileInfoInst.sFileDirPath;
-
-		
+		//		//this->sFileInfoInst.sFileDirPath = sFile_Info;
+		//		//this->sFileInfoInst.sFileDirPath.replace(this->sFileInfoInst.sFileDirPath.find(UI::GetUIInst()->itRootFolders->c_str()), UI::GetUIInst()->itRootFolders->length(), mRootFolders.at(UI::GetUIInst()->itRootFolders->c_str()));
+		//	}
+		//	else
+		//		continue;
+		//	if (bFindStatus == FALSE)
+		//		break;
+		//}
+		//nLoc = 0;
+		//std::wcout << this->sFileInfoInst.sFileDirPath;		
 
 		//Parse file name
 		std::vector<std::basic_string<TCHAR>> vstFile_Info;
-		std::basic_string<TCHAR> stTir = _T("\\");
 		std::size_t nStartFrom = 0;
 
 		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			nLoc = sFile_Info.find(stTir, nStartFrom);
+			nLoc = sFile_Info.find('\\', nStartFrom);
 			vstFile_Info.push_back(sFile_Info.substr(nStartFrom, (nLoc - nStartFrom)));
 			sFile_Info.erase(nStartFrom, nLoc + 1);
 		}
@@ -1080,10 +1112,11 @@ DWORD FileProcess::GetFileInfobyFolder()
 };
 DWORD FileProcess::ChangeFolderView()
 {
-	std::basic_string<TCHAR> sFile_Info;
+	std::basic_string<TCHAR> sFile_Info = this->sFileInfoInst.sFileDirPath;
 	BOOL bFindStatus = FALSE;
 	std::size_t nLoc = 0;
 	DWORD dwErrorCode;
+	int i = 0;
 
 	//std::vector<std::basic_string<TCHAR>> vstFolderstoChng = { _T("h:\\CloudSt\\GDData\\03-Published"),  _T("h:\\Resources"), _T("h:\\CloudSt\\GDData\\02-Shared"), _T("h:\\CloudSt\\GDWiP\\01-WorkInProgress") };
 	std::vector<std::basic_string<TCHAR>> vstFoldersfromChng;
@@ -1104,57 +1137,53 @@ DWORD FileProcess::ChangeFolderView()
 	//																				{ vstFoldersfromChng.at(1).c_str(), vstFolderstoChng.at(1).c_str() },
 	//																				{ vstFoldersfromChng.at(2).c_str(), vstFolderstoChng.at(2).c_str() },
 	//																				{ vstFoldersfromChng.at(3).c_str(), vstFolderstoChng.at(3).c_str() } };
-	
-	try
+	std::regex rgMask("(h:)");
+	if (std::regex_match(sFile_Info.begin(), sFile_Info.end(), rgMask, std::regex_constants::match_not_bol))
 	{
-		sFile_Info = this->sFileInfoInst.sFileDirPath;
-	
-		int i = 0;
-		for (itvstFoldersfromChng = vstFoldersfromChng.begin(); itvstFoldersfromChng != vstFoldersfromChng.end(); ++itvstFoldersfromChng, ++itvstFolderstoChng)
+		try
 		{
-			nLoc = sFile_Info.find(*itvstFoldersfromChng, 0);
-			//int j = vstFoldersfromChng.at(i).length();
-			//std::basic_string<TCHAR> stTMP = vstFolderstoChng.at(i);
-			if (nLoc != std::basic_string<TCHAR>::npos)
+			for (itvstFoldersfromChng; itvstFoldersfromChng != vstFoldersfromChng.end(); ++itvstFoldersfromChng, ++itvstFolderstoChng)
 			{
-				//std::wcout << stTMP << "---" << j << "---" << stTMP;
-				sFile_Info.replace(0, itvstFoldersfromChng->length(), itvstFolderstoChng->c_str());
-				this->sFileInfoInst.sFileDirPathChngView = sFile_Info;
-				bFindStatus = TRUE;
+				nLoc = sFile_Info.find(*itvstFoldersfromChng, 0);
+				if (nLoc != std::basic_string<TCHAR>::npos)
+				{
+					sFile_Info.replace(0, itvstFoldersfromChng->length(), itvstFolderstoChng->c_str());
+					this->sFileInfoInst.sFileDirPathChngView = sFile_Info;
+				}
 			}
-			else
-				continue;
-			if (bFindStatus != FALSE)
-				break;
+			nLoc = 0;
+			dwErrorCode = GetLastError();
+			throw dwErrorCode;
 		}
-		nLoc = 0;
-
-		dwErrorCode = GetLastError();
-		throw dwErrorCode;
-	}
-	catch (DWORD dwErrorCode)
-	{
-		switch (dwErrorCode)
+		catch (DWORD dwErrorCode)
 		{
-		case ERROR_SUCCESS:
-		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			break;
-		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			switch (dwErrorCode)
+			{
+			case ERROR_SUCCESS:
+			case ERROR_NO_MORE_FILES:
+				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+				break;
+			default:
+				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+				Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			}
+		}
+		catch (...)
+		{
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
 		}
 	}
-	catch (...)
+	else 
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		this->sFileInfoInst.sFileDirPathChngView = std::move(sFile_Info);
+		dwErrorCode = GetLastError();
 	}
 
 	return dwErrorCode;
 };
 
-DWORD FileProcess::ChkMask(std::basic_string<TCHAR> sFileName)
+DWORD FileProcess::ChkMask(const std::basic_string<TCHAR> &sFileName)
 {
 	BOOL bmatchResult = FALSE;
 	DWORD dwErrorCode;
@@ -1189,7 +1218,7 @@ DWORD FileProcess::ChkMask(std::basic_string<TCHAR> sFileName)
 
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkCyrillic(std::basic_string<TCHAR> sFileName)
+DWORD FileProcess::ChkCyrillic(const std::basic_string<TCHAR> &sFileName)
 {
 	BOOL bmatchResult = NULL;
 	DWORD dwErrorCode;
@@ -1268,6 +1297,8 @@ DWORD FileProcess::ChkProjectDR()
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = NULL;
 	this->sFileInfoInst.iChkProjectDR = -1;
+	std::transform(this->sFileInfoInst.sFile_ProjectbyPath.begin(), this->sFileInfoInst.sFile_ProjectbyPath.end(), this->sFileInfoInst.sFile_ProjectbyPath.begin(), ::tolower);
+	std::transform(this->sFileInfoInst.sFile_ProjectbyName.begin(), this->sFileInfoInst.sFile_ProjectbyName.end(), this->sFileInfoInst.sFile_ProjectbyName.begin(), ::tolower);
 	try
 	{
 		if (this->sFileInfoInst.sFile_ProjectbyPath != this->sFileInfoInst.sFile_ProjectbyName)
