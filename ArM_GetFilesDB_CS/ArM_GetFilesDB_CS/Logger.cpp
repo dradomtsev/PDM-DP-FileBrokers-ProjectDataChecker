@@ -47,6 +47,7 @@ DWORD Logger::CreateMySQLLog()
 	try
 	{
 		std::shared_ptr<sql::Statement> stmt;
+		//sql::Statement* stmt;
 		std::string stMySQLST_Truncate("TRUNCATE TABLE ");
 		stMySQLST_Truncate.append(DBProcess::dbProcInstance()->stMySQLTableErrors.stMySQLTable_name);
 		stMySQLST_Truncate.append(";");
@@ -97,7 +98,8 @@ DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::string &sState1, char*
 DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::string &sState2)
 {
 	DWORD dwErrorCode = -1;
-	std::string sFileTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1);
+	std::string sFileTMP = "";
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1, sFileTMP);
 
 	this->sBuff.insert(0,cAddString1);
 	this->sBuff.append(sFileTMP);
@@ -117,8 +119,10 @@ DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &s
 DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &sState1, char* cAddString2, int iErrorCode, char* cAddString3, const std::basic_string<TCHAR> &sState2)
 {
 	DWORD dwErrorCode = -1;
-	std::string sFuncTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1);
-	std::string sFileTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2);
+	std::string sFuncTMP = "";
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1, sFuncTMP);
+	std::string sFileTMP = "";
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
 
 	this->sBuff.insert(0, cAddString1);
 	this->sBuff.append(sFuncTMP);
@@ -157,8 +161,10 @@ DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::st
 DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::basic_string<TCHAR> sState1, int iErrorCode, std::basic_string<TCHAR> sState2)
 {
 	DWORD dwErrorCode = -1;
-	std::string sFuncTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1);
-	std::string sFileTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2);
+	std::string sFuncTMP = "";
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1, sFuncTMP);
+	std::string sFileTMP = "";
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
 
 	this->stSubjectBuff.insert(0, stSubject);
 	this->sBuff.insert(0, stFunc);
@@ -179,7 +185,8 @@ DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::ba
 DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::string sState1, int iErrorCode, std::basic_string<TCHAR> sState2)
 {
 	DWORD dwErrorCode = -1;
-	std::string sFileTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2);
+	std::string sFileTMP = "";
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
 
 	this->stSubjectBuff.insert(0, stSubject);
 	this->sBuff.insert(0, stFunc);

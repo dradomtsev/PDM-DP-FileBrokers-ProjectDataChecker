@@ -7,8 +7,9 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	DWORD dwErrorCode = -1;
-	FileProcess hFpInst;
+	FileProcess* hFpInst = new FileProcess();
 	SYSTEMTIME stlocalTime;
 	std::basic_string<TCHAR> stFormatStr(MAX_PATH,0);
 
@@ -29,14 +30,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	stFormatStr.clear();
 
 	UI::GetUIInst()->ConvertDateTime();
-	hFpInst.InitReviewPeriod(); // Init review period
+	hFpInst->InitReviewPeriod(); // Init review period
 	stFormatStr = _T("Check period initialized");
 	std::wcout << std::left << stFormatStr << std::endl;
 	stFormatStr.clear();
 	
 	// Init MySQL Engine
 	dwErrorCode = -1;
-	dwErrorCode = hFpInst.StartMySQLConect();
+	dwErrorCode = hFpInst->StartMySQLConect();
 	stFormatStr = _T("MySQL DB connection strarted");
 	std::wcout << std::left << stFormatStr << std::endl;
 	stFormatStr.clear();
@@ -47,7 +48,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	stFormatStr.clear();
 
 	dwErrorCode = -1;
-	dwErrorCode = hFpInst.InitMySQLConect();
+	dwErrorCode = hFpInst->InitMySQLConect();
 	stFormatStr = _T("MySQL DB connection initialized");
 	std::wcout << std::left << stFormatStr << std::endl;
 	stFormatStr.clear();
@@ -57,7 +58,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		wprintf_s(_T("Working in main directory: %s\r\n"), UI::GetUIInst()->itFolderstoParse->c_str());
 		stFormatStr.clear();
 
-		dwErrorCode = hFpInst.IterDirs(UI::GetUIInst()->itFolderstoParse->c_str()); // Process dirs for review & ignore
+		dwErrorCode = hFpInst->IterDirs(UI::GetUIInst()->itFolderstoParse->c_str()); // Process dirs for review & ignore
 		if (dwErrorCode == ERROR_NO_MORE_FILES)
 			SetLastError(ERROR_SUCCESS);
 	}
@@ -66,7 +67,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	stFormatStr.clear();
 
 	// Delete MySQL Engine instance
-	hFpInst.CloseMySQLConect();
+	hFpInst->CloseMySQLConect();
 	stFormatStr = _T("MySQL DB connection closed");
 	std::wcout << std::left << stFormatStr << std::endl;
 	stFormatStr.clear();
@@ -75,5 +76,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	GetLocalTime(&stlocalTime);
 	wprintf_s(_T("%s ended at: %d:%d:%d %d:%d:%d\r\n"), UI::GetUIInst()->stModuleName.c_str(), stlocalTime.wYear, stlocalTime.wMonth, stlocalTime.wDay, stlocalTime.wHour, stlocalTime.wMinute, stlocalTime.wSecond);
 	//system("pause");
+	delete hFpInst;
+	_CrtDumpMemoryLeaks();
     return 0;
 }

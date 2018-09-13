@@ -2,13 +2,17 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "stdafx.h"
 
-FileProcess::FileProcess() : curSysTime(), curFileTime(), tStartChkPeriod(), tEndChkPeriod(), sFileInfoInst()
+FileProcess::FileProcess() : sFileInfoInst()
 {
-	//vstExistDirs.push_back(_T(""));
-	//vstExistExtens.push_back(_T(""));
-	
-	iIndex = 0;
-	npos = -1;
+	iIndex			= 0;
+	npos			= -1;
+	//vstExistExtens	= { _T("") };
+	//vstExistDirs	= { _T("") };
+	curSysTime		= { 0 };
+	curFileTime		= { 0 };
+	tStartChkPeriod = { 0 };
+	tEndChkPeriod	= { 0 };
+	//sFileInfoInst	= { 0 };
 };
 FileProcess::~FileProcess() {};
 DWORD FileProcess::InitReviewPeriod()
@@ -492,8 +496,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 			{
 				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(CreateFile()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", stFilePathtemp);
 				Logger::GetLogInstance()->PrepareMySQLLOG("Error access denied->invalid file handle value", "Function->IterProcessFiles(CreateFile())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, stFilePathtemp);
-				if (hFile != nullptr)
-					CloseHandle(hFile);
+				//if (hFile != nullptr)
+					//CloseHandle(hFile);
 				return dwErrorCode;
 			}
 			if (dwErrorCode == ERROR_FILENAME_EXCED_RANGE)
@@ -526,8 +530,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 			FindClose(hFileDataFindFirst);
 			if (hFile != nullptr)
 				CloseHandle(hFile);
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(CreateFile(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(CreateFile(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(CreateFile(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(CreateFile(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterProcessFiles->CreateFile(DWORD dwErrorCode)"), (LPTSTR)this->sFileInfoInst.sFileName.c_str(), dwErrorCode);
 		}
 	}
@@ -536,8 +540,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		FindClose(hFileDataFindFirst);
 		if (hFile != nullptr)
 			CloseHandle(hFile);
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(CreateFile(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(CreateFile(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(CreateFile(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(CreateFile(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterProcessFiles->CreateFile(...)"), (LPTSTR)this->sFileInfoInst.sFileName.c_str(), dwErrorCode);
 	}
 	SetLastError(ERROR_SUCCESS);
@@ -547,8 +551,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		// Get file info
 		if (hFile != INVALID_HANDLE_VALUE)
 		{
-			this->sFileInfoInst.sFileDirName = std::move(twrkDirName);
-			this->sFileInfoInst.sFileDirPath = std::move(twrkDirtemp);
+			this->sFileInfoInst.sFileDirName = twrkDirName;
+			this->sFileInfoInst.sFileDirPath = twrkDirtemp;
 
 			this->sFileInfoInst.sFileExtension = PathFindExtension(this->sFileInfoInst.sFileName.c_str());
 
@@ -558,23 +562,13 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 			dwErrorCode = this->GetFileCAWTime(hFile);
 			dwErrorCode = this->ChangeFolderView();
 
-			this->sFileInfoInst.iChkMask			= -1;
-			this->sFileInfoInst.iChkCyrillic		= -1;
-			this->sFileInfoInst.iChkProjectDB		= -1;
-			this->sFileInfoInst.iChkProjectDR		= -1;
-			this->sFileInfoInst.iChkÑompanyDB		= -1;
-			this->sFileInfoInst.iChkRoleDB			= -1;
-			this->sFileInfoInst.iChkStageDB			= -1;
-			this->sFileInfoInst.iChkStageDR			= -1;
-			this->sFileInfoInst.iChkSubSystemDB		= -1;
-			this->sFileInfoInst.iChkDataTypeDB		= -1;
 
-			dwErrorCode = this->ChkMask(this->sFileInfoInst.sFileName);
+			dwErrorCode = this->ChkMask();
 			if (this->sFileInfoInst.iChkMask == 0)
 				throw dwErrorCode;
 			dwErrorCode = this->GetFileInfobyName();
 			dwErrorCode = this->GetFileInfobyFolder();
-			dwErrorCode = this->ChkCyrillic(this->sFileInfoInst.sFileName);
+			dwErrorCode = this->ChkCyrillic();
 			dwErrorCode = this->ChkProjectDB();
 			dwErrorCode = this->ChkProjectDR();
 			dwErrorCode = this->ChkÑompanyDB();
@@ -600,8 +594,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 			FindClose(hFileDataFindFirst);
 			if (hFile != nullptr)
 				CloseHandle(hFile);
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfo(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfo(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfo(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfo(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterProcessFiles->GetFileInfo(DWORD dwErrorCode)"), (LPTSTR)this->sFileInfoInst.sFileName.c_str(), dwErrorCode);
 		}
 	}
@@ -610,51 +604,53 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		FindClose(hFileDataFindFirst);
 		if (hFile != nullptr)
 			CloseHandle(hFile);
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfo(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfo(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfo(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfo(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterProcessFiles->GetFileInfo(...)"), (LPTSTR)this->sFileInfoInst.sFileName.c_str(), dwErrorCode);
 	}
 
 	// Write to table "Folders"
-	try
-	{
+	//try
+	//{
 		if (this->vstExistDirs.empty())
 		{
-			this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPathChngView);
+			this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPath);
 			DBProcess::dbProcInstance()->DBWriteFolders(this);
 		}
 		else
 		{
-			if (!(std::find(this->vstExistDirs.begin(), this->vstExistDirs.end(), this->sFileInfoInst.sFileDirPathChngView.c_str()) != this->vstExistDirs.end()))
+			std::vector<std::basic_string<TCHAR>>::const_iterator it = std::find(this->vstExistDirs.begin(), this->vstExistDirs.end(), this->sFileInfoInst.sFileDirPath);
+			if (it == this->vstExistDirs.end())
 			{
-				this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPathChngView);
+				this->vstExistDirs.push_back(this->sFileInfoInst.sFileDirPath);
 				DBProcess::dbProcInstance()->DBWriteFolders(this);
 			}
 		}
-		dwErrorCode = GetLastError();
-		throw dwErrorCode;
-	}
-	catch (DWORD dwErrorCode)
-	{
-		switch (dwErrorCode)
-		{
-		case ERROR_SUCCESS:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPathChngView);
-			break;
-		default:
-			FindClose(hFileDataFindFirst);
-			if (hFile != nullptr)
-				CloseHandle(hFile);
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterObjects(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPathChngView);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in writing to TABLE folders", "Function->IterObjects(DBWriteFolders())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileDirPathChngView);
-			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFolders()"), (LPTSTR)this->sFileInfoInst.sFileDirPathChngView.c_str(), dwErrorCode);
-		}
-	}
+		//dwErrorCode = GetLastError();
+		//throw dwErrorCode;
+	//}
+	//catch (DWORD dwErrorCode)
+	//{
+	//	switch (dwErrorCode)
+	//	{
+	//	case ERROR_SUCCESS:
+	//		//Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPathChngView);
+	//		break;
+	//	//default:
+	//		//FindClose(hFileDataFindFirst);
+	//		//if (hFile != nullptr)
+	//			//CloseHandle(hFile);
+	//		//Logger::GetLogInstance()->PrepareTXTLOG("Function->IterObjects(DBWriteFolders()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileDirPathChngView);
+	//		//Logger::GetLogInstance()->PrepareMySQLLOG("Error in writing to TABLE folders", "Function->IterObjects(DBWriteFolders())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileDirPathChngView);
+	//		//ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFolders()"), (LPTSTR)this->sFileInfoInst.sFileDirPath.c_str(), dwErrorCode);
+	//		//break;
+	//	}
+	//}
 
 	// Write to table "Extensions"
 	try
 	{
-		std::transform(this->sFileInfoInst.sFileExtension.begin(), this->sFileInfoInst.sFileExtension.end(), this->sFileInfoInst.sFileExtension.begin(), ::tolower);
+		//std::transform(this->sFileInfoInst.sFileExtension.begin(), this->sFileInfoInst.sFileExtension.end(), this->sFileInfoInst.sFileExtension.begin(), ::tolower);
 		if (this->vstExistExtens.empty())
 		{
 			this->vstExistExtens.push_back(this->sFileInfoInst.sFileExtension);
@@ -662,14 +658,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		}
 		else
 		{
-			//std::basic_string<TCHAR> stFormatStr(MAX_PATH, 0);
-			//stFormatStr = this->sFileInfoInst.sFileExtension;
-			//stFormatStr = *this->vstExistExtens.begin();
-			//std::wcout << std::left << stFormatStr << std::endl;
-			//stFormatStr.clear();
-			
-			auto result = std::find(this->vstExistExtens.cbegin(), this->vstExistExtens.cend(), this->sFileInfoInst.sFileExtension);
-			if (result == this->vstExistExtens.cend())
+			auto result = std::find(this->vstExistExtens.begin(), this->vstExistExtens.end(), this->sFileInfoInst.sFileExtension);
+			if (result == this->vstExistExtens.end())
 			{
 					this->vstExistExtens.push_back(this->sFileInfoInst.sFileExtension.c_str());
 					DBProcess::dbProcInstance()->DBWriteExtensions(this);
@@ -794,95 +784,103 @@ DWORD FileProcess::GetFileOwnerName(HANDLE hFile, std::basic_string<TCHAR> sFile
 	}
 	// Reallocate memory for the buffers.
 	HANDLE hProcHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE | HEAP_GENERATE_EXCEPTIONS, (size_t)dwAcctName,0);
-	AcctName = (LPTSTR)HeapAlloc(hProcHeap, HEAP_ZERO_MEMORY, (size_t)dwAcctName);
-	bRtnBool = HeapValidate(hProcHeap, 0, NULL);
-	//AcctName = (LPTSTR)GlobalAlloc(GMEM_FIXED, dwAcctName);
-	dwErrorCode = GetLastError();
-	// Check GetLastError for GlobalAlloc error condition.
-	if (AcctName == NULL)
+	if (hProcHeap != nullptr)
 	{
+		AcctName = (LPTSTR)HeapAlloc(hProcHeap, HEAP_ZERO_MEMORY, (size_t)dwAcctName-1);
+		bRtnBool = HeapValidate(hProcHeap, 0, NULL);
+		//AcctName = (LPTSTR)GlobalAlloc(GMEM_FIXED, dwAcctName);
 		dwErrorCode = GetLastError();
-		bRtnBool = HeapDestroy(hProcHeap);
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(HeapCreate(AcctName)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file owner", "Function->GetFileOwnerName(HeapCreate())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
-		ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("GetFileOwnerName->HeapCreate(AcctName)"), (LPTSTR)sFileName.c_str(), dwErrorCode);
-	}
-	if (dwErrorCode == ERROR_INSUFFICIENT_BUFFER)
-	{
-		SetLastError(ERROR_SUCCESS);
-		dwErrorCode = 0;
-	}
-	HANDLE hProcHeapT = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE | HEAP_GENERATE_EXCEPTIONS, (size_t)dwDomainName, 0);
-	DomainName = (LPTSTR)HeapAlloc(hProcHeapT, HEAP_GENERATE_EXCEPTIONS | HEAP_ZERO_MEMORY, (size_t)dwDomainName);
-	bRtnBool = HeapValidate(hProcHeapT, 0, NULL);
-	//DomainName = (LPTSTR)GlobalAlloc(GMEM_FIXED, dwDomainName);
-	dwErrorCode = GetLastError();
-	// Check GetLastError for GlobalAlloc error condition.
-	if (DomainName == NULL)
-	{
-		dwErrorCode = GetLastError();
-		bRtnBool = HeapDestroy(hProcHeapT);
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(HeapCreate(DomainName)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file owner", "Function->GetFileOwnerName(HeapCreate())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
-		ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("GetFileOwnerName->HeapCreate(DomainName)"), (LPTSTR)sFileName.c_str(), dwErrorCode);
-	}
-	// Second call to LookupAccountSid to get the account name.
-	std::basic_string<TCHAR> wsFileAcctName;
-	bRtnBool = LookupAccountSid(
-		NULL,                   // name of local or remote computer
-		pSidOwner,              // security identifier
-		AcctName,               // account name buffer
-		(LPDWORD)&dwAcctName,   // size of account name buffer 
-		DomainName,             // domain name
-		(LPDWORD)&dwDomainName, // size of domain name buffer
-		&eUse);                 // SID type
-
-								// Check GetLastError for LookupAccountSid error condition.
-	dwErrorCode = GetLastError();
-	if (bRtnBool == FALSE)
-	{
-		if (dwErrorCode == ERROR_NONE_MAPPED)
+		// Check GetLastError for GlobalAlloc error condition.
+		if (AcctName != NULL)
 		{
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(LookupAccountSid()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in Look up Account Sid, Owner changed to \"Àäìèíèñòðàòîðû\"", "Function->LookupAccountSid(())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
-			wsFileAcctName.append(_T("Àäìèíèñòðàòîðû"));
-			this->sFileInfoInst.sFileOwnerName = wsFileAcctName;
-			LocalFree(pSD);
-			bRtnBool = HeapDestroy(hProcHeap);
-			bRtnBool = FALSE;
-			bRtnBool = HeapDestroy(hProcHeapT);
-			SetLastError(ERROR_SUCCESS);
-			dwErrorCode = 0;
-			return dwErrorCode;
+			//if (dwErrorCode == ERROR_INSUFFICIENT_BUFFER)
+			//{
+			//	SetLastError(ERROR_SUCCESS);
+			//	dwErrorCode = 0;
+			//}
+			HANDLE hProcHeapT = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE | HEAP_GENERATE_EXCEPTIONS, (size_t)dwDomainName, 0);
+			if (hProcHeapT != nullptr)
+			{
+				DomainName = (LPTSTR)HeapAlloc(hProcHeapT, HEAP_GENERATE_EXCEPTIONS | HEAP_ZERO_MEMORY, (size_t)dwDomainName - 1);
+				bRtnBool = HeapValidate(hProcHeapT, 0, NULL);
+				//DomainName = (LPTSTR)GlobalAlloc(GMEM_FIXED, dwDomainName);
+				dwErrorCode = GetLastError();
+				// Check GetLastError for GlobalAlloc error condition.
+				if (DomainName != NULL)
+				{
+					// Second call to LookupAccountSid to get the account name.
+					std::basic_string<TCHAR> wsFileAcctName;
+					bRtnBool = LookupAccountSid(
+						NULL,                   // name of local or remote computer
+						pSidOwner,              // security identifier
+						AcctName,               // account name buffer
+						(LPDWORD)&dwAcctName,   // size of account name buffer 
+						DomainName,             // domain name
+						(LPDWORD)&dwDomainName, // size of domain name buffer
+						&eUse);                 // SID type
+
+												// Check GetLastError for LookupAccountSid error condition.
+					dwErrorCode = GetLastError();
+					if (bRtnBool == FALSE)
+					{
+						if (dwErrorCode == ERROR_NONE_MAPPED)
+						{
+							Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(LookupAccountSid()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
+							Logger::GetLogInstance()->PrepareMySQLLOG("Error in Look up Account Sid, Owner changed to \"Àäìèíèñòðàòîðû\"", "Function->LookupAccountSid(())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
+							wsFileAcctName.append(_T("Àäìèíèñòðàòîðû"));
+							this->sFileInfoInst.sFileOwnerName = wsFileAcctName;
+							LocalFree(pSD);
+							bRtnBool = HeapDestroy(hProcHeap);
+							bRtnBool = FALSE;
+							bRtnBool = HeapDestroy(hProcHeapT);
+							SetLastError(ERROR_SUCCESS);
+							dwErrorCode = 0;
+							return dwErrorCode;
+						}
+						else
+						{
+							Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(LookupAccountSid()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
+							Logger::GetLogInstance()->PrepareMySQLLOG("Error in Look up Account Sid", "Function->LookupAccountSid(())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
+							LocalFree(pSD);
+							HeapDestroy(hProcHeap);
+							//bRtnBool = FALSE;
+							HeapDestroy(hProcHeapT);
+							return dwErrorCode;
+						}
+					}
+					else
+					{
+						wsFileAcctName.append(AcctName);
+						this->sFileInfoInst.sFileOwnerName = wsFileAcctName;
+						dwErrorCode = -1;
+						LocalFree(pSD);
+						bRtnBool = HeapDestroy(hProcHeap);
+						bRtnBool = FALSE;
+						bRtnBool = HeapDestroy(hProcHeapT);
+						//CloseHandle(hFileLocal);
+					}
+				}
+				else
+				{
+					dwErrorCode = GetLastError();
+					bRtnBool = HeapDestroy(hProcHeapT);
+					Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(HeapCreate(DomainName)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
+					Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file owner", "Function->GetFileOwnerName(HeapCreate())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
+					ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("GetFileOwnerName->HeapCreate(DomainName)"), (LPTSTR)sFileName.c_str(), dwErrorCode);
+				}
+			}
 		}
 		else
 		{
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(LookupAccountSid()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in Look up Account Sid", "Function->LookupAccountSid(())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
-			LocalFree(pSD);
-			HeapDestroy(hProcHeap);
-			//bRtnBool = FALSE;
-			HeapDestroy(hProcHeapT);
-			return dwErrorCode;
+			dwErrorCode = GetLastError();
+			bRtnBool = HeapDestroy(hProcHeap);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->GetFileOwnerName(HeapCreate(AcctName)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file owner", "Function->GetFileOwnerName(HeapCreate())", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileName);
+			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("GetFileOwnerName->HeapCreate(AcctName)"), (LPTSTR)sFileName.c_str(), dwErrorCode);
 		}
 	}
-	else
-	{
-		wsFileAcctName.append(AcctName);
-		//std::string sFileAcctName(AcctName);
-		//std::basic_string<TCHAR> wsFileDomainName(DomainName);
-		//std::string sFileDomainName(wsFileDomainName.begin(), wsFileDomainName.end());
-		this->sFileInfoInst.sFileOwnerName = std::move(wsFileAcctName);
-		//this->sFileInfoInst.sFileOwnerName = sFileDomainName + "\\" + sFileAcctName;
-		dwErrorCode = -1;
-		LocalFree(pSD);
-		bRtnBool = HeapDestroy(hProcHeap);
-		bRtnBool = FALSE;
-		bRtnBool = HeapDestroy(hProcHeapT);
-		//CloseHandle(hFileLocal);
-		dwErrorCode = GetLastError();
-		return dwErrorCode;
-	}
+	dwErrorCode = GetLastError();
+	return dwErrorCode;
 };
 DWORD FileProcess::GetFileSizeInst(HANDLE hFile)
 {
@@ -901,17 +899,17 @@ DWORD FileProcess::GetFileSizeInst(HANDLE hFile)
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileSizeInst(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileSizeInst(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileSizeInst(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileSizeInst(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileSizeInst(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileSizeInst(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileSizeInst(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileSizeInst(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileSizeInst(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileSizeInst(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 	
 	return dwErrorCode;
@@ -968,17 +966,17 @@ DWORD FileProcess::GetFileCAWTime(HANDLE hFile)
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileCAWTime(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileCAWTime(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileCAWTime(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileCAWTime(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileCAWTime(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileCAWTime(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileCAWTime(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileCAWTime(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileCAWTime(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileCAWTime(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1025,17 +1023,17 @@ DWORD FileProcess::GetFileInfobyName()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1095,17 +1093,17 @@ DWORD FileProcess::GetFileInfobyFolder()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyFolder(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyFolder(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyFolder(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyFolder(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1161,29 +1159,29 @@ DWORD FileProcess::ChangeFolderView()
 			{
 			case ERROR_SUCCESS:
 			case ERROR_NO_MORE_FILES:
-				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 				break;
 			default:
-				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-				Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+				Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+				Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 			}
 		}
 		catch (...)
 		{
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChangeFolderView(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChangeFolderView(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	else 
 	{
-		this->sFileInfoInst.sFileDirPathChngView = std::move(sFile_Info);
+		this->sFileInfoInst.sFileDirPathChngView = sFile_Info;
 		dwErrorCode = GetLastError();
 	}
 
 	return dwErrorCode;
 };
 
-DWORD FileProcess::ChkMask(const std::basic_string<TCHAR> &sFileName)
+DWORD FileProcess::ChkMask()
 {
 	BOOL bmatchResult = FALSE;
 	DWORD dwErrorCode;
@@ -1191,7 +1189,7 @@ DWORD FileProcess::ChkMask(const std::basic_string<TCHAR> &sFileName)
 	try
 	{
 		std::basic_regex<TCHAR> regMaskCommon(UI::GetUIInst()->vstChk_FileMaskCommon.c_str());
-		bmatchResult = std::regex_match(sFileName, regMaskCommon);
+		bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, regMaskCommon);
 		this->sFileInfoInst.iChkMask = bmatchResult;
 
 		dwErrorCode = GetLastError();
@@ -1203,22 +1201,22 @@ DWORD FileProcess::ChkMask(const std::basic_string<TCHAR> &sFileName)
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkCyrillic(const std::basic_string<TCHAR> &sFileName)
+DWORD FileProcess::ChkCyrillic()
 {
 	BOOL bmatchResult = NULL;
 	DWORD dwErrorCode;
@@ -1227,7 +1225,7 @@ DWORD FileProcess::ChkCyrillic(const std::basic_string<TCHAR> &sFileName)
 	{
 		std::basic_regex<TCHAR> regMaskCommon(UI::GetUIInst()->vstChk_Cyrillic.c_str()); // [U+0400–U+04FF] // /[À-ßà-ÿ¨¸¿¯³²]/u // [À-ßà-ÿ¨¸¿¯³²] // [\u0400-\u04FF]
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
-		bmatchResult = std::regex_search(sFileName, mrSearchresult, regMaskCommon);
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileName, mrSearchresult, regMaskCommon);
 		if (bmatchResult == FALSE)
 			bmatchResult = TRUE;
 		else
@@ -1243,17 +1241,17 @@ DWORD FileProcess::ChkCyrillic(const std::basic_string<TCHAR> &sFileName)
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkCyrillic(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkCyrillic(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkCyrillic(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkCyrillic(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1277,17 +1275,17 @@ DWORD FileProcess::ChkProjectDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1316,17 +1314,17 @@ DWORD FileProcess::ChkProjectDR()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDR(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDR(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 	
 	return dwErrorCode;
@@ -1365,17 +1363,17 @@ DWORD FileProcess::ChkÑompanyDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 	
 	return dwErrorCode;
@@ -1414,17 +1412,17 @@ DWORD FileProcess::ChkRoleDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkRoleDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkRoleDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1464,17 +1462,17 @@ DWORD FileProcess::ChkStageDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑChkStageDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑChkStageDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1506,17 +1504,17 @@ DWORD FileProcess::ChkStageDR()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1541,17 +1539,17 @@ DWORD FileProcess::ChkSubSystemDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;
@@ -1575,17 +1573,17 @@ DWORD FileProcess::ChkDataTypeDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	catch (...)
 	{
-		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", sFileInfoInst.sFileName);
-		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(...)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+		Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(...))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 	}
 
 	return dwErrorCode;

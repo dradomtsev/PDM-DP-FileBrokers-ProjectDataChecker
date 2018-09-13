@@ -51,9 +51,11 @@ void ErrorHandle::ErrorExit(LPTSTR lpszFunction, LPTSTR lpszAddText, DWORD dwErr
 
 	hsResult = StringCchLength((LPTSTR)lpMsgBuf, STRSAFE_MAX_CCH - 1, &lpMsgBuf_Len);
 	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, (lpMsgBuf_Len + lpszFunctionTemp_Len + lpszAddTextTemp_Len + 40) * sizeof(TCHAR));
-	StringCchPrintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR),	TEXT("%s failed with error %u: %s"), pszDest, dwErrorCode, (LPTSTR)lpMsgBuf);
-	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
-
+	if (lpDisplayBuf != 0)
+	{
+		hsResult = StringCchPrintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR), TEXT("%s failed with error %u: %s"), pszDest, dwErrorCode, (LPTSTR)lpMsgBuf);
+		MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
+	}
 	LocalFree(lpMsgBuf);
 	LocalFree(lpDisplayBuf);
 	ExitProcess(dwErrorCode);

@@ -5,10 +5,8 @@ class FileProcess
 {
 private:
 
-	SYSTEMTIME	curSysTime;
-	FILETIME	curFileTime;
-	FILETIME	tStartChkPeriod;
-	FILETIME	tEndChkPeriod;
+protected:
+public:
 	struct FileCAWTime
 	{
 		INT64 i64Time_create, i64Time_access, i64Time_write;
@@ -33,28 +31,28 @@ private:
 		std::basic_string<TCHAR> sFile_StagebyPath;
 		std::basic_string<TCHAR> sFile_SubsystembyName;
 		std::basic_string<TCHAR> sFile_DatatypebyName;
-		INT iChkMask		= -1;
-		INT iChkCyrillic	= -1;
-		INT iChkProjectDB	= -1;
-		INT iChkProjectDR	= -1;
-		INT iChk—ompanyDB	= -1;
-		INT iChkRoleDB		= -1;
-		INT iChkStageDB		= -1;
-		INT iChkStageDR		= -1;
+		INT iChkMask = -1;
+		INT iChkCyrillic = -1;
+		INT iChkProjectDB = -1;
+		INT iChkProjectDR = -1;
+		INT iChk—ompanyDB = -1;
+		INT iChkRoleDB = -1;
+		INT iChkStageDB = -1;
+		INT iChkStageDR = -1;
 		INT iChkSubSystemDB = -1;
-		INT iChkDataTypeDB	= -1;
-		LARGE_INTEGER sFileSize		= { 0 };
-		//std::string sNumberofLinks;
-		FileCAWTime sFileCAWTime	= { 0 };
-	} sFileInfoInst;
+		INT iChkDataTypeDB = -1;
+		LARGE_INTEGER sFileSize = { 0 };
+		FileCAWTime sFileCAWTime = { 0 };
+	};
+	FileInfo sFileInfoInst;
 	std::basic_string <char>::size_type iIndex;
 	std::basic_string <char>::size_type npos;
 	std::vector<std::basic_string<TCHAR>> vstExistExtens;
 	std::vector<std::basic_string<TCHAR>> vstExistDirs;
-	//std::vector<std::basic_string<TCHAR>> vstExistDirsRoot;
-	//std::basic_string<TCHAR> stDirPathforNameCheck;
-protected:
-public:
+	SYSTEMTIME	curSysTime;
+	FILETIME	curFileTime;
+	FILETIME	tStartChkPeriod;
+	FILETIME	tEndChkPeriod;
 	//friend class UI;
 	friend class DBProcess;
 
@@ -77,8 +75,8 @@ public:
 	DWORD GetFileInfobyName		();
 	DWORD GetFileInfobyFolder	();
 	DWORD ChangeFolderView		();
-	DWORD ChkMask				(const std::basic_string<TCHAR> &sFileName);
-	DWORD ChkCyrillic			(const std::basic_string<TCHAR> &sFileName);
+	DWORD ChkMask				();
+	DWORD ChkCyrillic			();
 	DWORD ChkProjectDB			();
 	DWORD ChkProjectDR			();
 	DWORD Chk—ompanyDB			();

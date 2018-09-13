@@ -20,10 +20,10 @@ DWORD UI::FindExePath()
 	SetLastError(ERROR_SUCCESS);
 	int iSize = 0;
 	std::size_t nLocCRLF = 0;
-	TCHAR tModulePath[MAX_PATH + 1] = { 0 };
+	TCHAR tModulePath[MAX_PATH] = { 0 };
 	try
 	{
-		iSize = GetModuleFileName(NULL, tModulePath, sizeof(tModulePath));
+		iSize = GetModuleFileName(NULL, tModulePath, MAX_PATH);
 		dwErrorCode = GetLastError();
 		if (iSize == 0)
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("FindExePath->GetModuleFileName()"), _T("."), dwErrorCode);
@@ -75,7 +75,7 @@ DWORD UI::FindExePath()
 DWORD UI::InitbyINI()
 {
 	DWORD lpdwFlags;
-	LARGE_INTEGER liFileSize;
+	DWORD liFileSize;
 	std::basic_string<TCHAR> stCurDirBuff;
 	HANDLE hFile = nullptr;
 	DWORD dwErrorCode = -1;
@@ -165,7 +165,7 @@ DWORD UI::InitbyINI()
 	SetLastError(ERROR_SUCCESS);
 	try
 	{
-		bStatus = GetFileSizeEx(hFile,&liFileSize);
+		liFileSize = GetFileSize(hFile,NULL);
 		dwErrorCode = GetLastError();
 		if (bStatus == 0)
 		{
@@ -191,8 +191,7 @@ DWORD UI::InitbyINI()
 	}
 	//5. Read INI-file
 	SetLastError(ERROR_SUCCESS);
-	DWORD nBytesToRead = liFileSize.QuadPart;
-	//std::wstring stINIbuffer(nBytesToRead, 0);
+	DWORD nBytesToRead = liFileSize;
 	std::basic_string<TCHAR> stINIbuffer(nBytesToRead,0);
 	//TCHAR *InPointDirBuff = new TCHAR[nBytesToRead];
 	//InPointDirBuff[nBytesToRead/2] = 0;

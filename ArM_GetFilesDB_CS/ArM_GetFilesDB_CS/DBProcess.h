@@ -19,7 +19,6 @@ private:
 		std::vector<std::string> stMySQLTable_fields;
 	}stMySQLTableErrors, stMySQLTableExtens, stMySQLTableFiles, stMySQLTableFolders, stMySQLTableUsers, stMySQLTableProjects, stMySQLTableCompanies, stMySQLTableRole, stMySQLTableSubsystem, stMySQLTableDatatype;
 protected:
-
 	sql::Driver *driver;
 	std::shared_ptr<sql::Connection> con;
 public:
