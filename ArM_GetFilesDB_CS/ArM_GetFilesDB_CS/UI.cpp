@@ -644,7 +644,28 @@ DWORD UI::InitbyINI()
 		}
 		vstINI.erase(vstINI.begin());
 		nLoc = 0;
-
+		//
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
+		vstINI[0].erase(nStartFrom, nLoc + 1);
+		while (nLoc != std::basic_string<TCHAR>::npos)
+		{
+			nLoc = vstINI[0].find(';', nStartFrom);
+			vstChk_FindDStageShaPubZZ.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
+			vstINI[0].erase(nStartFrom, nLoc + 1);
+		}
+		vstINI.erase(vstINI.begin());
+		nLoc = 0;
+		//
+		nLoc = vstINI[0].find_first_of('-', nStartFrom);
+		vstINI[0].erase(nStartFrom, nLoc + 1);
+		while (nLoc != std::basic_string<TCHAR>::npos)
+		{
+			nLoc = vstINI[0].find(';', nStartFrom);
+			vstChk_FileMaskDStageShaPubZZ.assign(vstINI[0].substr(nStartFrom, (nLoc - nStartFrom)).c_str());
+			vstINI[0].erase(nStartFrom, nLoc + 1);
+		}
+		vstINI.erase(vstINI.begin());
+		nLoc = 0;
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}

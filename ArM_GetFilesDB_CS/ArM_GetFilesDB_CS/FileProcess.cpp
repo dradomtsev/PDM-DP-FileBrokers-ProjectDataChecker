@@ -572,7 +572,6 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 				this->sFileInfoInst.iChkProjectStatus = -1;
 				throw dwErrorCode;
 			}
-				
 			dwErrorCode = this->GetFileInfobyName();
 			dwErrorCode = this->GetFileInfobyFolder();
 			dwErrorCode = this->ChkCyrillic();
@@ -1185,13 +1184,21 @@ DWORD FileProcess::ChangeFolderView()
 
 DWORD FileProcess::ChkMask()
 {
-	BOOL bmatchResult = FALSE;
+	bool bmatchResult = FALSE;
 	DWORD dwErrorCode;
 	this->sFileInfoInst.iChkMask = -1;
 	try
 	{
 		std::basic_regex<TCHAR> regMaskCommon(UI::GetUIInst()->vstChk_FileMaskCommon.c_str());
-		bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, regMaskCommon);
+		std::basic_regex<TCHAR> regFindDStageShaPubZZ(UI::GetUIInst()->vstChk_FindDStageShaPubZZ.c_str());
+		std::basic_regex<TCHAR> regMaskDStageShaPubZZ(UI::GetUIInst()->vstChk_FileMaskDStageShaPubZZ.c_str());
+
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, regFindDStageShaPubZZ);
+		if (bmatchResult == TRUE)
+			bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, regMaskDStageShaPubZZ);
+		else
+			bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, regMaskCommon);
+		
 		this->sFileInfoInst.iChkMask = bmatchResult;
 
 		dwErrorCode = GetLastError();
@@ -1208,6 +1215,7 @@ DWORD FileProcess::ChkMask()
 		default:
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			break;
 		}
 	}
 	catch (...)

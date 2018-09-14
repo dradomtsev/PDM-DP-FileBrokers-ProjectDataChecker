@@ -66,4 +66,6 @@ public:
 	std::basic_string<TCHAR> vstChk_Company;
 	std::basic_string<TCHAR> vstChk_Role;
 	std::basic_string<TCHAR> vstChk_Stage;
+	std::basic_string<TCHAR> vstChk_FindDStageShaPubZZ;
+	std::basic_string<TCHAR> vstChk_FileMaskDStageShaPubZZ;
 };
