@@ -31,6 +31,7 @@ public:
 	DWORD DBWriteFolders				(FileProcess *fpInst);
 	DWORD DBWriteExtensions				(FileProcess *fpInst);
 	DWORD DBWriteFiles					(FileProcess *fpInst);
+	//DWORD DBCheckProjectsActuallity		(FileProcess *fpInst, BOOL &bStatus);
 	DWORD DBGetProjects					(FileProcess *fpInst, BOOL &bStatus);
 	DWORD DBGetCompany					(FileProcess *fpInst, BOOL &bStatus);
 	DWORD DBGetRole						(FileProcess *fpInst, BOOL &bStatus);

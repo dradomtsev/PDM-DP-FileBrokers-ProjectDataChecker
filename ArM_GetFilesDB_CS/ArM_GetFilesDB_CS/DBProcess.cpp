@@ -312,7 +312,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		std::string sFileNameTMP = "";
 		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileName, sFileNameTMP);
 
-		std::string stMySQLST_Insert ("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16, field_17) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+		std::string stMySQLST_Insert ("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16, field_17, field_18) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableFiles.stMySQLTable_name);
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_0"), std::string("field_0").length(), stMySQLTableFiles.stMySQLTable_fields.at(0));
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_1"), std::string("field_1").length(), stMySQLTableFiles.stMySQLTable_fields.at(1));
@@ -333,6 +333,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_15"), std::string("field_15").length(), stMySQLTableFiles.stMySQLTable_fields.at(15));
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_16"), std::string("field_16").length(), stMySQLTableFiles.stMySQLTable_fields.at(16));
 		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_17"), std::string("field_17").length(), stMySQLTableFiles.stMySQLTable_fields.at(17));
+		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_18"), std::string("field_18").length(), stMySQLTableFiles.stMySQLTable_fields.at(18));
 
 		pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert));
 		pstmtWrite->setString	(1, sFileNameTMP);
@@ -355,6 +356,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		pstmtWrite->setInt64	(16, fpInst->sFileInfoInst.sFileCAWTime.i64Time_create);
 		pstmtWrite->setInt64	(17, fpInst->sFileInfoInst.sFileCAWTime.i64Time_write);
 		pstmtWrite->setInt64	(18, fpInst->sFileInfoInst.sFileCAWTime.i64Time_access);
+		pstmtWrite->setInt		(19, fpInst->sFileInfoInst.iChkProjectStatus);
 
 		pstmtWrite->execute();
 		pstmtWrite->close();
@@ -383,7 +385,62 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		}
 	}
 	return dwErrorCode;
-};
+}
+//DWORD DBProcess::DBCheckProjectsActuallity(FileProcess * fpInst, BOOL & bStatus)
+//{
+//	DWORD dwErrorCode = -1;
+//	std::shared_ptr<sql::PreparedStatement> pstmtGet;
+//	std::shared_ptr<sql::ResultSet> resGet;
+//	int Result = 0;
+//	int iProjectID = 0;
+//	return 0;
+//
+//	// Get from portal.projects
+//	try
+//	{
+//		std::string sFile_ProjectTMP = "";
+//		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectbyName, sFile_ProjectTMP);
+//		sFile_ProjectTMP.append("%");
+//		std::string stMySQLST_Select("SELECT status FROM tablename WHERE field LIKE (?) AND status = 1;");
+//		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableProjects.stMySQLTable_name);
+//		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableProjects.stMySQLTable_fields.at(0));
+//		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
+//		pstmtGet->setString(1, sFile_ProjectTMP);
+//		resGet.reset(pstmtGet->executeQuery());
+//		pstmtGet->close();
+//		while (resGet->next())
+//		{
+//			bStatus = TRUE;
+//			iProjectID = resGet->getInt(1);
+//		};
+//		resGet.reset();
+//		pstmtGet.reset();
+//
+//		dwErrorCode = GetLastError();
+//		throw dwErrorCode;
+//	}
+//	catch (sql::SQLException &e)
+//	{
+//		Logger::GetLogInstance()->PrepareMySQLLOG("Error SELECT status FROM projects", "Function->DBCheckProjectsActuallity(SELECT status FROM projects)", e.what(), e.getErrorCode(), e.getSQLState());
+//		Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCheckProjectsActuallity(SELECT status FROM projects) -> MySQL error: ", e.what(), "MySQL error code: ", e.getErrorCode(), "SQLState: ", e.getSQLState());
+//	}
+//	catch (DWORD Err_code)
+//	{
+//		switch (Err_code)
+//		{
+//		case ERROR_SUCCESS:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCheckProjectsActuallity(SELECT status FROM projects): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
+//			break;
+//		default:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCheckProjectsActuallity(SELECT status FROM projects): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
+//			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->DBWriteFiles(SELECT status FROM projects)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
+//			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBCheckProjectsActuallity(SELECT status FROM projects)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+//			break;
+//		}
+//	}
+//	return dwErrorCode;
+//}
+//;
 DWORD DBProcess::DBGetProjects(FileProcess *fpInst, BOOL &bStatus)
 {
 	DWORD dwErrorCode = -1;
@@ -545,15 +602,16 @@ DWORD DBProcess::DBGetStage(FileProcess *fpInst, BOOL &bStatus)
 	DWORD dwErrorCode = -1;
 	std::shared_ptr<sql::PreparedStatement> pstmtGet;
 	std::shared_ptr<sql::ResultSet> resGet;
+	fpInst->sFileInfoInst.iChkProjectStatus = -1;
 	int Result = 0;
-	int iStageID = 0;
+	//int iStageID = 0;
 
 	// Get from portal.files
 	try
 	{
 		std::string sFile_StageTMP = "";
 		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectStageforDB, sFile_StageTMP);
-		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field = (?);");
+		std::string stMySQLST_Select("SELECT status FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableProjects.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableProjects.stMySQLTable_fields.at(0));
 		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
@@ -563,8 +621,9 @@ DWORD DBProcess::DBGetStage(FileProcess *fpInst, BOOL &bStatus)
 		while (resGet->next())
 		{
 			bStatus = TRUE;
-			iStageID = resGet->getInt(1);
+			fpInst->sFileInfoInst.iChkProjectStatus = resGet->getInt(1);
 		};
+
 		resGet.reset();
 		pstmtGet.reset();
 

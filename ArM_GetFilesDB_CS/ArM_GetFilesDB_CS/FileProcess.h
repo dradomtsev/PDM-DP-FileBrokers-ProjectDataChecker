@@ -41,6 +41,7 @@ public:
 		INT iChkStageDR = -1;
 		INT iChkSubSystemDB = -1;
 		INT iChkDataTypeDB = -1;
+		INT iChkProjectStatus = -1;
 		LARGE_INTEGER sFileSize = { 0 };
 		FileCAWTime sFileCAWTime = { 0 };
 	};
