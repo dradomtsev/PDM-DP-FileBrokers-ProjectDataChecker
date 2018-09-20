@@ -43,7 +43,7 @@ DWORD AnsiStringToUnicodeString(const std::string &stIn, std::basic_string<TCHAR
 		}
 
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
@@ -94,7 +94,7 @@ DWORD ConvertStrings::UnicodeStringToAnsiString(const std::basic_string<TCHAR> &
 		}
 
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
@@ -132,7 +132,7 @@ DWORD ConvertStrings::UnicodeVectorToAnsiVector(const std::vector<std::basic_str
 			}
 			else
 			{
-				//vstOut.at(i).assign("");
+				//vstOut.at(i).assign(" ");
 				vstOut.at(i).resize(iCharSize);
 				iCharSize = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, it->c_str(), -1, &vstOut.at(i)[0], (int)iCharSize, NULL, NULL);
 				if (iCharSize == 0)
@@ -149,7 +149,7 @@ DWORD ConvertStrings::UnicodeVectorToAnsiVector(const std::vector<std::basic_str
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{

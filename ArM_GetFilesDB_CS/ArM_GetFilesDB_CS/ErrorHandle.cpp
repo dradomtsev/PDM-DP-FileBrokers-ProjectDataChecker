@@ -34,7 +34,7 @@ void ErrorHandle::ErrorExit(LPTSTR lpszFunction, LPTSTR lpszAddText, DWORD dwErr
 	LPTSTR lpszFunctionTemp = lpszFunction;
 	LPTSTR lpszAddTextTemp = lpszAddText;
 	
-	TCHAR pszDest[] = _T("");
+	TCHAR pszDest[] = _T(" ");
 	hsResult = StringCchLength(pszDest, STRSAFE_MAX_CCH - 1, &pszDest_Len);
 	hsResult = StringCchLength(lpszFunctionTemp, STRSAFE_MAX_CCH - 1, &lpszFunctionTemp_Len);
 	isSize = pszDest_Len + lpszFunctionTemp_Len + 1;

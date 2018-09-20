@@ -3,28 +3,38 @@
 class UI
 {
 private:
-	std::basic_string<TCHAR> stWorkDir;
-	std::basic_string<TCHAR> stFileINI_Name;// = _T("\\ArM_ChkFile_INI.txt");
-	std::basic_string<TCHAR> stModulePath;
-	
-protected:
-	UI(const UI&);                 // Prevent copy-construction
-	UI& operator=(const UI&);      // Prevent assignment
 	UI();
 	~UI();
+	UI(const UI&) = delete;                 // Prevent copy-construction
+	UI& operator=(const UI&) = delete;      // Prevent assignment
+protected:
 public:
 	friend class FileProcess;
 	friend class Logger;
 	friend class DBProcess;
-	static UI* GetUIInst();
+
+	static UI& GetUIInst()
+	{
+		static UI UIInst;
+		return UIInst;
+	};
+	//const std::basic_string<TCHAR>& GetString()	{return stFileINI_Name;	}
+		
 	DWORD FindExePath();
 	DWORD InitbyINI();
 	DWORD ConvertDateTime();
+	DWORD InitReviewPeriod();
+
+	std::basic_string<TCHAR> stWorkDir;
+	std::basic_string<TCHAR> stFileINI_Name;
+	std::basic_string<TCHAR> stModuleName;
+	std::basic_string<TCHAR> stModulePath;
+	
 
 	SYSTEMTIME stStartChkPeriod;
 	SYSTEMTIME stEndChkPeriod;
-
-	std::basic_string<TCHAR> stModuleName;
+	FILETIME	tStartChkPeriod;
+	FILETIME	tEndChkPeriod;
 
 	std::vector<std::basic_string<TCHAR>> vstFolderstoParse;
 	std::vector<std::basic_string<TCHAR>>::iterator itFolderstoParse;

@@ -19,7 +19,7 @@ Logger * Logger::GetLogInstance()
 DWORD Logger::CreateTXTLog()
 {
 	DWORD dwErrorCode = -1;
-	this->sLogFile.sFileRoot = UI::GetUIInst()->stModulePath;
+	this->sLogFile.sFileRoot = UI::GetUIInst().stModulePath;
 	this->sLogFile.sFilePath.append(this->sLogFile.sFileRoot.c_str());// =  + this->sLogFile.sFileName;
 	this->sLogFile.sFilePath.append(this->sLogFile.sFileName.c_str());
 	this->hFile = CreateFile(this->sLogFile.sFilePath.c_str(), GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL); //READ_CONTROL
@@ -49,10 +49,10 @@ DWORD Logger::CreateMySQLLog()
 		std::shared_ptr<sql::Statement> stmt;
 		//sql::Statement* stmt;
 		std::string stMySQLST_Truncate("TRUNCATE TABLE ");
-		stMySQLST_Truncate.append(DBProcess::dbProcInstance()->stMySQLTableErrors.stMySQLTable_name);
+		stMySQLST_Truncate.append(DBProcess::dbProcInstance().stMySQLTableErrors.stMySQLTable_name);
 		stMySQLST_Truncate.append(";");
-		stmt.reset(DBProcess::dbProcInstance()->con->createStatement());
-		stmt->execute(stMySQLST_Truncate);
+		stmt.reset(DBProcess::dbProcInstance().con->createStatement());
+		stmt->execute(stMySQLST_Truncate.c_str());
 		stmt->close();
 
 		dwErrorCode = GetLastError();
@@ -121,22 +121,33 @@ DWORD Logger::PrepareTXTLOG(char* cAddString1, const std::basic_string<TCHAR> &s
 	DWORD dwErrorCode = -1;
 	std::string sFuncTMP = "";
 	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1, sFuncTMP);
-	std::string sFileTMP = "";
-	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
+	if (dwErrorCode == 0)
+	{
+		dwErrorCode = -1;
+		std::string sFileTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
+		if ( dwErrorCode == 0)
+		{
+			this->sBuff.insert(0, cAddString1);
+			this->sBuff.append(sFuncTMP);
+			this->sBuff.append(" ");
+			this->sBuff.append(cAddString2);
+			std::string sBuffTemp = std::to_string(iErrorCode);
+			this->sBuff.append(sBuffTemp.c_str());
+			this->sBuff.append(" ");
+			this->sBuff.append(cAddString3);
+			this->sBuff.append(sFileTMP);
+			this->sBuff.append("\r\n");
+			this->WriteToTXTLog();
 
-	this->sBuff.insert(0, cAddString1);
-	this->sBuff.append(sFuncTMP);
-	this->sBuff.append(" ");
-	this->sBuff.append(cAddString2);
-	std::string sBuffTemp = std::to_string(iErrorCode);
-	this->sBuff.append(sBuffTemp.c_str());
-	this->sBuff.append(" ");
-	this->sBuff.append(cAddString3);
-	this->sBuff.append(sFileTMP);
-	this->sBuff.append("\r\n");
-	this->WriteToTXTLog();
+			this->sBuff.clear();
+		}
+	}
+	else
+	{
+		return dwErrorCode;
+	}
 
-	this->sBuff.clear();
 	return dwErrorCode;
 };
 DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::string sState1, int iErrorCode, std::string sState2)
@@ -163,23 +174,32 @@ DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::ba
 	DWORD dwErrorCode = -1;
 	std::string sFuncTMP = "";
 	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState1, sFuncTMP);
-	std::string sFileTMP = "";
-	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
+	if (dwErrorCode == 0)
+	{
+		dwErrorCode = -1;
+		std::string sFileTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(sState2, sFileTMP);
+		if (dwErrorCode == 0)
+		{
+			this->stSubjectBuff.insert(0, stSubject);
+			this->sBuff.insert(0, stFunc);
+			this->sBuff.append(sFuncTMP);
+			this->sBuff.append(" Error code: ");
+			std::string sBuffTemp = std::to_string(iErrorCode);
+			this->sBuff.append(sBuffTemp.c_str());
+			this->sBuff.append(" Object: ");
+			this->sBuff.append(sFileTMP);
+			this->sBuff.append("\r\n");
 
-	this->stSubjectBuff.insert(0, stSubject);
-	this->sBuff.insert(0, stFunc);
-	this->sBuff.append(sFuncTMP);
-	this->sBuff.append(" Error code: ");
-	std::string sBuffTemp = std::to_string(iErrorCode);
-	this->sBuff.append(sBuffTemp.c_str());
-	this->sBuff.append(" Object: ");
-	this->sBuff.append(sFileTMP);
-	this->sBuff.append("\r\n");
+			this->WriteToMySQLLog();
 
-	this->WriteToMySQLLog();
+			this->stSubjectBuff.clear();
+			this->sBuff.clear();
+		}
+	}
+	else
+		return dwErrorCode;
 
-	this->stSubjectBuff.clear();
-	this->sBuff.clear();
 	return dwErrorCode;
 };
 DWORD Logger::PrepareMySQLLOG(std::string stSubject, std::string stFunc, std::string sState1, int iErrorCode, std::basic_string<TCHAR> sState2)
@@ -254,12 +274,12 @@ DWORD Logger::WriteToMySQLLog()
 	try
 	{
 		std::string stMySQLST_Insert("INSERT INTO tablename (subject, description) VALUES (?,?);");		
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"),	std::string("tablename").length(),	DBProcess::dbProcInstance()->stMySQLTableErrors.stMySQLTable_name.c_str());
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("subject"),		std::string("subject").length(),	DBProcess::dbProcInstance()->stMySQLTableErrors.stMySQLTable_fields.at(0).c_str());
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("description"),	std::string("description").length(),DBProcess::dbProcInstance()->stMySQLTableErrors.stMySQLTable_fields.at(1).c_str());
-		pstmtWrite.reset(DBProcess::dbProcInstance()->con->prepareStatement(stMySQLST_Insert));// extensions extensions_bak
-		pstmtWrite->setString(1, this->stSubjectBuff);
-		pstmtWrite->setString(2, this->sBuff);
+		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"),	std::string("tablename").length(),	DBProcess::dbProcInstance().stMySQLTableErrors.stMySQLTable_name.c_str());
+		stMySQLST_Insert.replace(stMySQLST_Insert.find("subject"),		std::string("subject").length(),	DBProcess::dbProcInstance().stMySQLTableErrors.stMySQLTable_fields.at(0).c_str());
+		stMySQLST_Insert.replace(stMySQLST_Insert.find("description"),	std::string("description").length(),DBProcess::dbProcInstance().stMySQLTableErrors.stMySQLTable_fields.at(1).c_str());
+		pstmtWrite.reset(DBProcess::dbProcInstance().con->prepareStatement(stMySQLST_Insert.c_str()));// extensions extensions_bak
+		pstmtWrite->setString(1, this->stSubjectBuff.c_str());
+		pstmtWrite->setString(2, this->sBuff.c_str());
 		pstmtWrite->execute();
 		pstmtWrite->close();
 

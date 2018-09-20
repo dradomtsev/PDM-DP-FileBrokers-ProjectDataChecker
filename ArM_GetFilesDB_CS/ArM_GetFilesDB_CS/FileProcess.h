@@ -52,22 +52,23 @@ public:
 	std::vector<std::basic_string<TCHAR>> vstExistDirs;
 	SYSTEMTIME	curSysTime;
 	FILETIME	curFileTime;
-	FILETIME	tStartChkPeriod;
-	FILETIME	tEndChkPeriod;
+	std::basic_regex<TCHAR> regFindDStageShaPubZZ;
+	std::basic_regex<TCHAR> regMaskDStageShaPubZZ;
+	std::basic_regex<TCHAR> regMaskCommon;
+	std::basic_regex<TCHAR> regMaskCyrillic;
+	std::basic_regex<TCHAR> regMaskCompany;
+	std::basic_regex<TCHAR> regMaskRole;
+	std::basic_regex<TCHAR> regMaskStage;
+	std::basic_regex<TCHAR> stRegFileStructbyMask;
+	std::basic_regex<TCHAR> stRegRoleMask;
 	//friend class UI;
 	friend class DBProcess;
 
 	FileProcess();
 	~FileProcess();
-
-	DWORD InitReviewPeriod		();
-
-	DWORD StartMySQLConect		();
-	DWORD InitMySQLConect		();
-	DWORD CloseMySQLConect		();
 	
 	DWORD IterDirs				(std::basic_string<TCHAR> stWorkDir);
-	DWORD IterObjects			(std::basic_string<TCHAR> twrkDir,const std::basic_string<TCHAR> &twrkDirName, int iCounter);
+	DWORD IterObjects			(std::basic_string<TCHAR> twrkDir,const std::basic_string<TCHAR> twrkDirName, int iCounter);
 	DWORD IterProcessFiles		(HANDLE hFileDataFindFirst, std::basic_string<TCHAR> twrkDirtemp, std::basic_string<TCHAR> twrkDirName);
 
 	DWORD GetFileOwnerName		(HANDLE hFile, std::basic_string<TCHAR> sFileName);

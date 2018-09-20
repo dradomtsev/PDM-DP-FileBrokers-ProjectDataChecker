@@ -7,14 +7,27 @@
 
 #include "targetver.h"
 
-//#define _ITERATOR_DEBUG_LEVEL 1
+//#define _ITERATOR_DEBUG_LEVEL 0
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
-#define _CRTDBG_MAP_ALLOC  
+
+#ifdef _DEBUG
+	#define _CRTDBG_MAP_ALLOC
+	//#define new new( _NORMAL_BLOCK, __FILE__, __LINE__)
+	//#ifndef DBG_NEW      
+	//#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )     
+	//#define new DBG_NEW   
+	//#endif
+#endif
+
+// TODO: reference additional headers your program requires here
+
 // Windows Header Files:
 #include <windows.h>
 
 // C RunTime Header Files
 #include <stdlib.h>
+#include <crtdbg.h>
+
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
@@ -26,7 +39,7 @@
 #include <strsafe.h>
 #include <vector>
 #include <algorithm>
-#include <crtdbg.h>
+
 #include <iostream>
 #include <regex>
 #include <string.h>
@@ -35,7 +48,6 @@
 //#include <atlbase.h>
 //#include <atlstr.h>
 
-// TODO: reference additional headers your program requires here
 #include "accctrl.h"
 #include "aclapi.h"
 #pragma comment(lib, "advapi32.lib")

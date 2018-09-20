@@ -25,7 +25,12 @@ public:
 	friend class FileProcess;
 	friend class Logger;
 
-	static  DBProcess* dbProcInstance	();
+	static  DBProcess& dbProcInstance()
+	{
+		static DBProcess dbProcInst;
+		return dbProcInst;
+	};
+
 	DWORD DBCreateMYSQLConnection		();
 	DWORD DBInitTables					();
 	DWORD DBWriteFolders				(FileProcess *fpInst);
