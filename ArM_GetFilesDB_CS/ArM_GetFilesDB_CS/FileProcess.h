@@ -54,6 +54,7 @@ public:
 	FILETIME	curFileTime;
 	std::basic_regex<TCHAR> regFindDStageShaPubZZ;
 	std::basic_regex<TCHAR> regMaskDStageShaPubZZ;
+	std::basic_regex<TCHAR> regMaskDCompanyShaPubZZ;
 	std::basic_regex<TCHAR> regMaskCommon;
 	std::basic_regex<TCHAR> regMaskCyrillic;
 	std::basic_regex<TCHAR> regMaskCompany;

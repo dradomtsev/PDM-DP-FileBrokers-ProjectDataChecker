@@ -15,6 +15,7 @@ FileProcess::FileProcess() : sFileInfoInst()
 	//sFileInfoInst	= { 0 };
 	regFindDStageShaPubZZ	= UI::GetUIInst().vstChk_FindDStageShaPubZZ.c_str();
 	regMaskDStageShaPubZZ	= UI::GetUIInst().vstChk_FileMaskDStageShaPubZZ.c_str();
+	regMaskDCompanyShaPubZZ = (_T("[\\[\\(](\\w+)[\\]\\)]"));
 	regMaskCommon			= UI::GetUIInst().vstChk_FileMaskCommon.c_str();
 	regMaskCyrillic			= UI::GetUIInst().vstChk_Cyrillic.c_str();
 	regMaskCompany			= UI::GetUIInst().vstChk_Company.c_str();
@@ -1290,7 +1291,15 @@ DWORD FileProcess::Chk—ompanyDB()
 	try
 	{
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskCompany);
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, this->regFindDStageShaPubZZ);
+		if (bmatchResult == TRUE)
+		{
+			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskDCompanyShaPubZZ);
+		}
+		else
+		{
+			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskCompany);
+		}
 
 		if (mrSearchresult.ready() && bmatchResult != 0)
 		{
@@ -1335,8 +1344,18 @@ DWORD FileProcess::ChkRoleDB()
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult2;
 		std::basic_string<TCHAR> sTMP;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskRole);
-
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, this->regFindDStageShaPubZZ);
+		if (bmatchResult == TRUE)
+		{
+			this->sFileInfoInst.iChkRoleDB = bmatchResult;
+			dwErrorCode = GetLastError();
+			throw dwErrorCode;
+		}
+		else
+		{
+			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskRole);
+		}
+		
 		if (mrSearchresult.ready() && bmatchResult != 0)
 		{
 			bmatchResult = FALSE;
@@ -1402,6 +1421,7 @@ DWORD FileProcess::ChkStageDB()
 					}
 				}
 			}
+			std::transform(sStageTMP.begin(), sStageTMP.end(), sStageTMP.begin(), ::tolower);
 			this->sFileInfoInst.sFile_ProjectStageforDB = this->sFileInfoInst.sFile_ProjectbyName + _T('-') + sStageTMP;
 			this->sFileInfoInst.sFile_StagebyName = mrSearchresult.str(1);
 			dwErrorCode = DBProcess::dbProcInstance().DBGetStage(this, bmatchResult);
