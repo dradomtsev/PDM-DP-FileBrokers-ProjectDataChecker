@@ -23,6 +23,7 @@ FileProcess::FileProcess() : sFileInfoInst()
 	regMaskStage			= UI::GetUIInst().vstChk_Stage.c_str();
 	stRegFileStructbyMask	= _T("-");
 	stRegRoleMask = (_T("^(\\d[a-zA-Z][a-zA-Z][a-zA-Z]|\\d[a-zA-Z][a-zA-Z]|\\d[a-zA-Z]|[a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z]|[a-zA-Z][a-zA-Z][a-zA-Z]|[a-zA-Z][a-zA-Z]|[a-zA-Z])"));
+	stOfficeOwnerFileMask = _T("\\~\\$");
 };
 FileProcess::~FileProcess() {};
 
@@ -232,11 +233,13 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 				continue;
 			else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_SPARSE_FILE)
 				continue;
-			/*else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
-				continue;*/
-			//else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
-				//break;
+			else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+				continue;
+			else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_TEMPORARY)
+				continue;
 			else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_VIRTUAL)
+				continue;
+			else if (std::regex_search(this->sFileInfoInst.sFileName, this->stOfficeOwnerFileMask))
 				continue;
 			else if (fdFileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{

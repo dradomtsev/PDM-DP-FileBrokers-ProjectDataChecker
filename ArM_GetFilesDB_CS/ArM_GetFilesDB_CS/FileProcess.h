@@ -62,6 +62,7 @@ public:
 	std::basic_regex<TCHAR> regMaskStage;
 	std::basic_regex<TCHAR> stRegFileStructbyMask;
 	std::basic_regex<TCHAR> stRegRoleMask;
+	std::basic_regex<TCHAR> stOfficeOwnerFileMask;
 	//friend class UI;
 	friend class DBProcess;
 
