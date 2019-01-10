@@ -1406,7 +1406,6 @@ DWORD FileProcess::ChkStageDB()
 	std::basic_string<TCHAR> sStageTMP;
 	try
 	{
-		
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
 		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_ProjectStagebyName, mrSearchresult, this->regMaskStage);
 

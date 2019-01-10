@@ -686,10 +686,11 @@ DWORD DBProcess::DBGetStage(FileProcess *fpInst, BOOL &bStatus)
 	{
 		std::string sFile_StageTMP = "";
 		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectStageforDB, sFile_StageTMP);
-		std::string stMySQLST_Select("SELECT status FROM tablename WHERE field = (?);");
+		std::string stMySQLST_Select("SELECT status FROM tablename WHERE field LIKE (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableProjects.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableProjects.stMySQLTable_fields.at(0));
 		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		sFile_StageTMP.append("%");
 		pstmtGet->setString(1, sFile_StageTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
