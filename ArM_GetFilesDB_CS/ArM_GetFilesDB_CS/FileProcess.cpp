@@ -396,7 +396,7 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		dwErrorCodeFAttrib = GetLastError();
 		if (bPathExist != 0 && dwFileAttributes != INVALID_FILE_ATTRIBUTES)
 		{
-			hFile = CreateFile(stFilePathtemp.c_str(), READ_CONTROL, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); //READ_CONTROL
+			hFile = CreateFile(stFilePathtemp.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL); //READ_CONTROL
 			dwErrorCode = GetLastError();
 			if (dwErrorCode == ERROR_ACCESS_DENIED && hFile == INVALID_HANDLE_VALUE)
 			{
@@ -615,8 +615,8 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 		}
 	}
 	
-	//if (hFile != nullptr)
-	//	CloseHandle(hFile);
+	if (hFile != nullptr)
+		CloseHandle(hFile);
 
 	return dwErrorCode;
 };
