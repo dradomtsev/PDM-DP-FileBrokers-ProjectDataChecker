@@ -67,9 +67,11 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 	DWORD dwErrorCode = -1;
 	BOOL bStatus = FALSE;
 	BOOL bmatchResult = FALSE;
+	std::basic_string<TCHAR>::size_type n;
 	//0. Set current working directory
 	std::basic_string<TCHAR> twrkDirtemp = twrkDir + twrkDirName;
-
+	std::basic_string<TCHAR> tstTempString_Left;
+	std::basic_string<TCHAR> tstTempString_Right;
 	wprintf_s(_T("Working in %s\r\n"), twrkDirtemp.c_str());
 
 	std::basic_string<TCHAR> wPathInsert(_T("\\\\?\\"));
@@ -249,11 +251,20 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 					if (this->iIndex == 0 || this->iIndex == 1)
 						continue;
 				int iDirStatus = 0;
+				tstTempString_Left = this->sFileInfoInst.sFileName;
 				for (std::vector<std::basic_string<TCHAR>>::iterator it = UI::GetUIInst().vstFolderstoIgnore.begin(); it != UI::GetUIInst().vstFolderstoIgnore.end(); ++it)
 				{
-					if (it->compare(this->sFileInfoInst.sFileName) == 0)
+					tstTempString_Right = it->c_str();
+					std::transform(tstTempString_Left.begin(), tstTempString_Left.end(), tstTempString_Left.begin(), ::towlower);
+					std::transform(tstTempString_Right.begin(), tstTempString_Right.end(), tstTempString_Right.begin(), ::towlower);
+					n = tstTempString_Left.find(tstTempString_Right);
+					//if (it->compare(this->sFileInfoInst.sFileName) == 0)
+					if (n != std::string::npos)
 						iDirStatus = -1;
+					
+					tstTempString_Right.clear();
 				}
+				tstTempString_Left.clear();
 				if (iDirStatus != -1)
 				{
 					this->IterObjects(twrkDirtemp, fdFileData.cFileName, iCounter);
@@ -267,16 +278,28 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 					if (this->iIndex == 0 || this->iIndex == 1)
 						continue;
 				int iDirStatus = 0;
+				tstTempString_Left = this->sFileInfoInst.sFileName;
 				for (std::vector<std::basic_string<TCHAR>>::iterator it = UI::GetUIInst().vstFolderstoIgnore.begin(); it != UI::GetUIInst().vstFolderstoIgnore.end(); ++it)
 				{
-					if (it->compare(this->sFileInfoInst.sFileName) != 0)
+					tstTempString_Right = it->c_str();
+					std::transform(tstTempString_Left.begin(), tstTempString_Left.end(), tstTempString_Left.begin(), ::towlower);
+					std::transform(tstTempString_Right.begin(), tstTempString_Right.end(), tstTempString_Right.begin(), ::towlower);
+					n = tstTempString_Left.find(tstTempString_Right);
+					//if (it->compare(this->sFileInfoInst.sFileName) != 0)
+					if (n == std::string::npos)
+					{
+						tstTempString_Right.clear();
 						continue;
+					}
+						
 					else
 					{
+						tstTempString_Right.clear();
 						iDirStatus = -1;
 						break;
 					}
 				}
+				tstTempString_Left.clear();
 				if (iDirStatus != -1)
 				{
 					//if (UI::GetUIInst().vstDaysToParse.compare(_T(" ")) == 0)

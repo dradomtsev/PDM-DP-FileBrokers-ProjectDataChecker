@@ -302,22 +302,22 @@ DWORD UI::InitbyINI()
 	std::size_t nLoc = 0;
 	
 	SetLastError(ERROR_SUCCESS);
+	bool bmatchResult = FALSE;
+	std::basic_regex<TCHAR> stRegSearch_1(_T("\r\n"));
+	std::basic_regex<TCHAR> stRegSearch_2(_T("\\[(.*?)\\]"));
+	std::basic_regex<TCHAR> stRegSearch_3(_T(";"));
+	std::wsmatch stSubMatch;
+	std::wsregex_token_iterator itEnd;
+	std::wsregex_token_iterator itEndIn;
+	std::basic_string<TCHAR> wsRegresult_1;
+	std::basic_string<TCHAR> wsRegresult_2;
+	std::basic_string<TCHAR> wsRegresult_3;
+	//std::basic_string<TCHAR> wsRegresult_4;
+	std::vector<std::basic_string<TCHAR>> wsINI = { _T("[FoldersToRead]"),_T("[FoldersIgnore]"),_T("[ChkStartDateTime]"),_T("[ChkEndDateTime]"),_T("[RootFolders]"),_T("[ErrorsTableName]"),_T("[ErrorsTableFields]"),_T("[ExtensTableName]"),_T("[ExtensTableFields]"),_T("[FilesTableName]"),_T("[FilesTableFields]"),_T("[FoldersTableName]"),_T("[FoldersTableFields]"),_T("[UsersTableName]"),_T("[UsersTableFields]"),_T("[ProjectsTableName]"),_T("[ProjectsTableFields]"),_T("[CompaniesTableName]"),_T("[CompaniesTableFields]"),_T("[RolesTableName]"),_T("[RolesTableFields]"),_T("[SubsystemsTableName]"),_T("[SubsystemsTableFields]"),_T("[DatatypesTableName]"),_T("[DatatypesTableFields]"),_T("[MySQLHostnamePort]"),_T("[MySQLLogin]"),_T("[MySQLPassword]"),_T("[MySQLDefaultSchema]"),_T("[ChkFileMaskCommon]"),_T("[ChkCyrillic]"),_T("[ChkCompany]"),_T("[ChkRole]"),_T("[ChkStage]"),_T("[ChkFindDStageShaPubZZ]"),_T("[ChkFileMaskDStageShaPubZZ]") };
+	//std::vector<std::basic_string<TCHAR>> vwsSubMatch;
+	//wsStringsINI ewsStringsINI;
 	try
 	{
-		bool bmatchResult = FALSE;
-		std::basic_regex<TCHAR> stRegSearch_1(_T("\r\n"));
-		std::basic_regex<TCHAR> stRegSearch_2(_T("\\[(.*?)\\]"));
-		std::basic_regex<TCHAR> stRegSearch_3(_T(";"));
-		std::wsmatch stSubMatch;
-		std::wsregex_token_iterator itEnd;
-		std::wsregex_token_iterator itEndIn;
-		std::basic_string<TCHAR> wsRegresult_1;
-		std::basic_string<TCHAR> wsRegresult_2;
-		std::basic_string<TCHAR> wsRegresult_3;
-		//std::basic_string<TCHAR> wsRegresult_4;
-		std::vector<std::basic_string<TCHAR>> wsINI = { _T("[FoldersToRead]"),_T("[FoldersIgnore]"),_T("[ChkStartDateTime]"),_T("[ChkEndDateTime]"),_T("[RootFolders]"),_T("[ErrorsTableName]"),_T("[ErrorsTableFields]"),_T("[ExtensTableName]"),_T("[ExtensTableFields]"),_T("[FilesTableName]"),_T("[FilesTableFields]"),_T("[FoldersTableName]"),_T("[FoldersTableFields]"),_T("[UsersTableName]"),_T("[UsersTableFields]"),_T("[ProjectsTableName]"),_T("[ProjectsTableFields]"),_T("[CompaniesTableName]"),_T("[CompaniesTableFields]"),_T("[RolesTableName]"),_T("[RolesTableFields]"),_T("[SubsystemsTableName]"),_T("[SubsystemsTableFields]"),_T("[DatatypesTableName]"),_T("[DatatypesTableFields]"),_T("[MySQLHostnamePort]"),_T("[MySQLLogin]"),_T("[MySQLPassword]"),_T("[MySQLDefaultSchema]"),_T("[ChkFileMaskCommon]"),_T("[ChkCyrillic]"),_T("[ChkCompany]"),_T("[ChkRole]"),_T("[ChkStage]"),_T("[ChkFindDStageShaPubZZ]"),_T("[ChkFileMaskDStageShaPubZZ]") };
-		//std::vector<std::basic_string<TCHAR>> vwsSubMatch;
-		//wsStringsINI ewsStringsINI;
 		std::wsregex_token_iterator itwsReg_1(stINIbuffer.begin(), stINIbuffer.end(), stRegSearch_1, -1);
 		for ( ; itwsReg_1 != itEnd; ++itwsReg_1)
 		{
@@ -551,8 +551,12 @@ DWORD UI::InitbyINI()
 					continue;
 				}
 			}
+			else
+			{
+				dwErrorCode = ERROR_FILE_INVALID;
+				throw dwErrorCode;
+			}
 		}
-		
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}
