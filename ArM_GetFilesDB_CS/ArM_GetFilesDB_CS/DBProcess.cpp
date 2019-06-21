@@ -5,10 +5,10 @@
 DBProcess::DBProcess() 
 {
 	DWORD dwErrorCode = 0;
-	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstMySQl_Hostname, MySQLConnectionInst.stTCIP);
-	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstMySQl_Login, MySQLConnectionInst.stLogin);
-	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstMySQl_Password, MySQLConnectionInst.stPassword);
-	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstMySQl_DefSchema, MySQLConnectionInst.stSchemaName);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_Hostname, MySQLConnectionInst.stTCIP);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_Login, MySQLConnectionInst.stLogin);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_Password, MySQLConnectionInst.stPassword);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_DefSchema, MySQLConnectionInst.stSchemaName);
 
 	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstErrorsTableName, stMySQLTableErrors.stMySQLTable_name);
 	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstErrorsTableFields, stMySQLTableErrors.stMySQLTable_fields);
@@ -387,7 +387,7 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileName, sFileNameTMP);
 		if (dwErrorCode == 0)
 		{
-			std::string stMySQLST_Insert("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16, field_17, field_18) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+			std::string stMySQLST_Insert("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16, field_17, field_18, field_19) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableFiles.stMySQLTable_name);
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_0"), std::string("field_0").length(), stMySQLTableFiles.stMySQLTable_fields.at(0));
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_1"), std::string("field_1").length(), stMySQLTableFiles.stMySQLTable_fields.at(1));
@@ -406,32 +406,36 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_13"), std::string("field_13").length(), stMySQLTableFiles.stMySQLTable_fields.at(13));
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_14"), std::string("field_14").length(), stMySQLTableFiles.stMySQLTable_fields.at(14));
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_15"), std::string("field_15").length(), stMySQLTableFiles.stMySQLTable_fields.at(15));
+
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_16"), std::string("field_16").length(), stMySQLTableFiles.stMySQLTable_fields.at(16));
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_17"), std::string("field_17").length(), stMySQLTableFiles.stMySQLTable_fields.at(17));
 			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_18"), std::string("field_18").length(), stMySQLTableFiles.stMySQLTable_fields.at(18));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_19"), std::string("field_19").length(), stMySQLTableFiles.stMySQLTable_fields.at(19));
 
 			pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert.c_str()));
-			pstmtWrite->setString(1, sFileNameTMP.c_str());
-			pstmtWrite->setInt(2, (int32_t)iExtension_ID);
-			pstmtWrite->setInt(3, (int32_t)iFolder_ID);
-			pstmtWrite->setInt(4, (int32_t)iUser_ID);
-			pstmtWrite->setString(5, sFileSize.c_str());
+			pstmtWrite->setString	(1, sFileNameTMP.c_str());
+			pstmtWrite->setInt		(2, (int32_t)iExtension_ID);
+			pstmtWrite->setInt		(3, (int32_t)iFolder_ID);
+			pstmtWrite->setInt		(4, (int32_t)iUser_ID);
+			pstmtWrite->setString	(5, sFileSize.c_str());
 
-			pstmtWrite->setInt(6, fpInst->sFileInfoInst.iChkMask);
-			pstmtWrite->setInt(7, fpInst->sFileInfoInst.iChkCyrillic);
-			pstmtWrite->setInt(8, fpInst->sFileInfoInst.iChkProjectDB);
-			pstmtWrite->setInt(9, fpInst->sFileInfoInst.iChkProjectDR);
-			pstmtWrite->setInt(10, fpInst->sFileInfoInst.iChkÑompanyDB);
-			pstmtWrite->setInt(11, fpInst->sFileInfoInst.iChkRoleDB);
-			pstmtWrite->setInt(12, fpInst->sFileInfoInst.iChkStageDB);
-			pstmtWrite->setInt(13, fpInst->sFileInfoInst.iChkStageDR);
-			pstmtWrite->setInt(14, fpInst->sFileInfoInst.iChkSubSystemDB);
-			pstmtWrite->setInt(15, fpInst->sFileInfoInst.iChkDataTypeDB);
+			pstmtWrite->setInt		(6, fpInst->sFileInfoInst.iChkMask);
+			pstmtWrite->setInt		(7, fpInst->sFileInfoInst.iChkCyrillic);
+			pstmtWrite->setInt		(8, fpInst->sFileInfoInst.iChkProjectDB);
+			pstmtWrite->setInt		(9, fpInst->sFileInfoInst.iChkProjectDR);
+			pstmtWrite->setInt		(10, fpInst->sFileInfoInst.iChkÑompanyDB);
+			pstmtWrite->setInt		(11, fpInst->sFileInfoInst.iChkRoleDB);
+			pstmtWrite->setInt		(12, fpInst->sFileInfoInst.iChkStageDB);
 
-			pstmtWrite->setInt64(16, fpInst->sFileInfoInst.sFileCAWTime.i64Time_create);
-			pstmtWrite->setInt64(17, fpInst->sFileInfoInst.sFileCAWTime.i64Time_write);
-			pstmtWrite->setInt64(18, fpInst->sFileInfoInst.sFileCAWTime.i64Time_access);
-			pstmtWrite->setInt(19, fpInst->sFileInfoInst.iChkProjectStatus);
+			pstmtWrite->setInt		(13, fpInst->sFileInfoInst.iChkStageDR);
+			pstmtWrite->setInt		(14, fpInst->sFileInfoInst.iChkSubSystemDB);
+			pstmtWrite->setInt		(15, fpInst->sFileInfoInst.iChkDataTypeDB);
+			pstmtWrite->setInt		(16, fpInst->sFileInfoInst.iChkBuildingSection);
+
+			pstmtWrite->setInt64(17, fpInst->sFileInfoInst.sFileCAWTime.i64Time_create);
+			pstmtWrite->setInt64(18, fpInst->sFileInfoInst.sFileCAWTime.i64Time_write);
+			pstmtWrite->setInt64(19, fpInst->sFileInfoInst.sFileCAWTime.i64Time_access);
+			pstmtWrite->setInt(20, fpInst->sFileInfoInst.iChkProjectStatus);
 
 			pstmtWrite->execute();
 			pstmtWrite->close();

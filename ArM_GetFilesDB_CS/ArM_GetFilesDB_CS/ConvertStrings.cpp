@@ -168,3 +168,63 @@ DWORD ConvertStrings::UnicodeVectorToAnsiVector(const std::vector<std::basic_str
 	}
 	return dwErrorCode;
 };
+
+DWORD ConvertStrings::s2ws(const std::string& stIn, std::wstring &wstOut)
+{
+	DWORD dwErrorCode = -1;
+	SetLastError(ERROR_SUCCESS);
+	try
+	{
+		using convert_typeX = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_typeX, wchar_t> converterX;
+		wstOut = converterX.from_bytes(stIn);
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+			break;
+		case ERROR_INSUFFICIENT_BUFFER:
+		case ERROR_INVALID_FLAGS:
+		case ERROR_INVALID_PARAMETER:
+		case ERROR_NO_UNICODE_TRANSLATION:
+		{
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->s2ws(): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", stIn);
+			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("s2ws()"), (LPTSTR)stIn.c_str(), dwErrorCode);
+			break;
+		}
+		}
+	}
+	return dwErrorCode;
+}
+
+DWORD ConvertStrings::ws2s(const std::wstring& wstIn, std::string &stOut)
+{
+	DWORD dwErrorCode = -1;
+	SetLastError(ERROR_SUCCESS);
+	try
+	{
+		using convert_typeX = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_typeX, wchar_t> converterX;
+		stOut = converterX.to_bytes(wstIn);
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+			break;
+		case ERROR_INSUFFICIENT_BUFFER:
+		case ERROR_INVALID_FLAGS:
+		case ERROR_INVALID_PARAMETER:
+		case ERROR_NO_UNICODE_TRANSLATION:
+		{
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->s2ws(): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", wstIn);
+			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("s2ws()"), (LPTSTR)wstIn.c_str(), dwErrorCode);
+			break;
+		}
+		}
+	}
+	return dwErrorCode;
+}

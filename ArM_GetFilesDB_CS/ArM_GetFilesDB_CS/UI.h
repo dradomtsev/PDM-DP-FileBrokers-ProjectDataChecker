@@ -67,15 +67,36 @@ public:
 	std::basic_string<TCHAR> vstDatatypesTableName;
 	std::vector<std::basic_string<TCHAR>> vstDatatypesTableFields;
 
-	std::basic_string<TCHAR> vstMySQl_Hostname;
-	std::basic_string<TCHAR> vstMySQl_Login;
-	std::basic_string<TCHAR> vstMySQl_Password;
-	std::basic_string<TCHAR> vstMySQl_DefSchema;
-	std::basic_string<TCHAR> vstChk_FileMaskCommon;
-	std::basic_string<TCHAR> vstChk_Cyrillic;
-	std::basic_string<TCHAR> vstChk_Company;
-	std::basic_string<TCHAR> vstChk_Role;
-	std::basic_string<TCHAR> vstChk_Stage;
-	std::basic_string<TCHAR> vstChk_FindDStageShaPubZZ;
-	std::basic_string<TCHAR> vstChk_FileMaskDStageShaPubZZ;
+	std::basic_string<TCHAR> stMySQl_Hostname;
+	std::basic_string<TCHAR> stMySQl_Login;
+	std::basic_string<TCHAR> stMySQl_Password;
+	std::basic_string<TCHAR> stMySQl_DefSchema;
+
+	std::vector<std::basic_string<TCHAR>> vstProjectsInclude_fns2;
+	std::vector<std::basic_string<TCHAR>> vstProjectsExclude_fns2;
+	std::basic_string<TCHAR> vstChk_FileMaskCommon_fns2;
+	std::basic_string<TCHAR> vstChk_Cyrillic_fns2;
+	std::basic_string<TCHAR> vstChk_Company_fns2;
+	std::basic_string<TCHAR> vstChk_Role_fns2;
+	std::basic_string<TCHAR> vstChk_Stage_fns2;
+	std::basic_string<TCHAR> vstChk_BuildingSection_fns2;
+	std::basic_string<TCHAR> vstChk_SubSystem_fns2;
+
+	std::basic_string<TCHAR> vstChk_FindDStageShaPubZZ_fns2;
+	std::basic_string<TCHAR> vstChk_FileMaskDStageShaPubZZ_fns2;
+	std::basic_string<TCHAR> vstChk_MaskDCompanyShaPubZZ_fns2;
+
+	std::vector<std::basic_string<TCHAR>> vstProjectsInclude_fns3;
+	std::vector<std::basic_string<TCHAR>> vstProjectsExclude_fns3;
+	std::basic_string<TCHAR> vstChk_FileMaskCommon_fns3;
+	std::basic_string<TCHAR> vstChk_Cyrillic_fns3;
+	std::basic_string<TCHAR> vstChk_Company_fns3;
+	std::basic_string<TCHAR> vstChk_Role_fns3;
+	std::basic_string<TCHAR> vstChk_Stage_fns3;
+	std::basic_string<TCHAR> vstChk_BuildingSection_fns3;
+	std::basic_string<TCHAR> vstChk_SubSystem_fns3;
+
+	std::basic_string<TCHAR> vstChk_FindDStageShaPubZZ_fns3;
+	std::basic_string<TCHAR> vstChk_FileMaskDStageShaPubZZ_fns3;
+	std::basic_string<TCHAR> vstChk_MaskDCompanyShaPubZZ_fns3;
 };

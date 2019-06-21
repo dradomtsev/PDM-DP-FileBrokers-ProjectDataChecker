@@ -5,7 +5,7 @@
 Logger::Logger()
 {
 	this->hFile = nullptr;
-	this->sLogFile.sFileName = _T("\\#Res-[ArM]1IM-P-ZZ-TD-GetFilesAttribsLOG.txt");
+	this->sLogFile.sFileName = _T("\\log.txt");//_T("\\#Res-[ArM]1IM-P-ZZ-TD-GetFilesAttribsLOG.txt");
 };
 Logger::~Logger() 
 {

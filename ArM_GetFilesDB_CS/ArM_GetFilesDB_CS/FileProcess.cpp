@@ -13,14 +13,16 @@ FileProcess::FileProcess() : sFileInfoInst()
 	//tStartChkPeriod = { 0 };
 	//tEndChkPeriod	= { 0 };
 	//sFileInfoInst	= { 0 };
-	regFindDStageShaPubZZ	= UI::GetUIInst().vstChk_FindDStageShaPubZZ.c_str();
-	regMaskDStageShaPubZZ	= UI::GetUIInst().vstChk_FileMaskDStageShaPubZZ.c_str();
-	regMaskDCompanyShaPubZZ = (_T("[\\[\\(](\\w+)[\\]\\)]"));
-	regMaskCommon			= UI::GetUIInst().vstChk_FileMaskCommon.c_str();
+
+	/*regFindDStageShaPubZZ	= UI::GetUIInst().vstChk_FindDStageShaPubZZ_fns2.c_str();
+	regMaskDStageShaPubZZ	= UI::GetUIInst().vstChk_FileMaskDStageShaPubZZ_fns2.c_str();
+	regMaskDCompanyShaPubZZ = UI::GetUIInst().vstChk_MaskDCompanyShaPubZZ.c_str();
+	regMaskCommon			= UI::GetUIInst().vstChk_Cyrillic.c_str();
 	regMaskCyrillic			= UI::GetUIInst().vstChk_Cyrillic.c_str();
 	regMaskCompany			= UI::GetUIInst().vstChk_Company.c_str();
 	regMaskRole				= UI::GetUIInst().vstChk_Role.c_str();
-	regMaskStage			= UI::GetUIInst().vstChk_Stage.c_str();
+	regMaskStage			= UI::GetUIInst().vstChk_Stage.c_str();*/
+
 	stRegFileStructbyMask	= _T("-");
 	stRegRoleMask = (_T("^(\\d[a-zA-Z][a-zA-Z][a-zA-Z]|\\d[a-zA-Z][a-zA-Z]|\\d[a-zA-Z]|[a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z]|[a-zA-Z][a-zA-Z][a-zA-Z]|[a-zA-Z][a-zA-Z]|[a-zA-Z])"));
 	stOfficeOwnerFileMask = _T("\\~\\$");
@@ -80,7 +82,7 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 	//std::basic_regex<TCHAR> stRegSearch(_T("\[UNC]"));
 	//bmatchResult = std::regex_search(twrkDirtemp, stRegSearch);
 	//if(bmatchResult != TRUE)
-		twrkDirtemp.insert(0, wPathInsert.c_str());
+	twrkDirtemp.insert(0, wPathInsert.c_str());
 
 	
 	try
@@ -313,11 +315,12 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 							this->curFileTime = fdFileData.ftLastWriteTime;
 							break;
 						case 0:
-							this->curFileTime = fdFileData.ftCreationTime;
-							break;
 						case 1:
 							this->curFileTime = fdFileData.ftCreationTime;
 							break;
+						//case 1:
+							//this->curFileTime = fdFileData.ftCreationTime;
+							//break;
 					}
 					int iStartLater		= CompareFileTime(&UI::GetUIInst().tStartChkPeriod, &this->curFileTime);
 					int iEndEarlier		= CompareFileTime(&UI::GetUIInst().tEndChkPeriod, &this->curFileTime);
@@ -494,26 +497,70 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 			this->sFileInfoInst.iChkSubSystemDB = -1;
 			this->sFileInfoInst.iChkDataTypeDB	= -1;
 
-			dwErrorCode = this->ChkMask();
-			if (this->sFileInfoInst.iChkMask == 0)
+			std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
+			
+
+			bool bmatchResult = false;
+			int bmatchResultExt = 0;
+			
+			for (const auto &ptVV : UI::GetUIInst().vstProjectsInclude_fns3)
 			{
-				this->sFileInfoInst.iChkProjectStatus = -1;
+				std::basic_string<TCHAR> stTemp = _T("^");
+				stTemp.append(ptVV.data());
+				std::basic_regex<TCHAR> regCommon(stTemp, std::regex_constants::icase);
+				bmatchResult = std::regex_search(this->sFileInfoInst.sFileName, mrSearchresult, regCommon);//this->regMaskStage);
+				bmatchResultExt = bmatchResultExt + (int)bmatchResult;
+			}
+			//Check by FNS #3
+			if (bmatchResultExt >= 1)//(itvstFound != vstFound.end())
+			{
+				dwErrorCode = this->ChkMask_fns3();
+				if (this->sFileInfoInst.iChkMask == 0)
+				{
+					this->sFileInfoInst.iChkProjectStatus = -1;
+					throw dwErrorCode;
+				}
+				dwErrorCode = this->GetFileInfobyName_fns3();
+				dwErrorCode = this->GetFileInfobyFolder();
+
+				dwErrorCode = this->ChkCyrillic();
+				dwErrorCode = this->ChkProjectDB();
+				dwErrorCode = this->ChkProjectDR();
+				this->sFileInfoInst.iChkÑompanyDB = true;
+				dwErrorCode = this->ChkStageDB_fns3();
+				dwErrorCode = this->ChkStageDR_fns3();
+				dwErrorCode = this->ChkBuildingSection_fns3();
+				dwErrorCode = this->ChkRoleDB_fns3();
+				dwErrorCode = this->ChkSubSystemDB_fns3();
+				this->sFileInfoInst.iChkDataTypeDB = true;
+			}
+			//Check by FNS #2
+			else
+			{
+				dwErrorCode = this->ChkMask_fns2();
+				if (this->sFileInfoInst.iChkMask == 0)
+				{
+					this->sFileInfoInst.iChkProjectStatus = -1;
+					throw dwErrorCode;
+				}
+				dwErrorCode = this->GetFileInfobyName_fns2();
+				dwErrorCode = this->GetFileInfobyFolder();
+
+				dwErrorCode = this->ChkCyrillic();
+				dwErrorCode = this->ChkProjectDB();
+				dwErrorCode = this->ChkProjectDR();
+				dwErrorCode = this->ChkÑompanyDB_fns2();
+				dwErrorCode = this->ChkRoleDB_fns2();
+				dwErrorCode = this->ChkStageDB_fns2();
+				dwErrorCode = this->ChkStageDR_fns2();
+				this->sFileInfoInst.iChkBuildingSection = true;
+				dwErrorCode = this->ChkSubSystemDB_fns2();
+				dwErrorCode = this->ChkDataTypeDB_fns2();
+				
+
+				dwErrorCode = GetLastError();
 				throw dwErrorCode;
 			}
-			dwErrorCode = this->GetFileInfobyName();
-			dwErrorCode = this->GetFileInfobyFolder();
-			dwErrorCode = this->ChkCyrillic();
-			dwErrorCode = this->ChkProjectDB();
-			dwErrorCode = this->ChkProjectDR();
-			dwErrorCode = this->ChkÑompanyDB();
-			dwErrorCode = this->ChkRoleDB();
-			dwErrorCode = this->ChkStageDB();
-			dwErrorCode = this->ChkStageDR();
-			dwErrorCode = this->ChkSubSystemDB();
-			dwErrorCode = this->ChkDataTypeDB();
-
-			dwErrorCode = GetLastError();
-			throw dwErrorCode;
 		}
 	}
 	catch (DWORD& dwErrorCode)
@@ -883,120 +930,7 @@ DWORD FileProcess::GetFileCAWTime(HANDLE hFile)
 
 	return dwErrorCode;
 };
-DWORD FileProcess::GetFileInfobyName()
-{
-	std::size_t nLoc = 0;
-	std::size_t nStartFrom = 0;
-	nLoc = this->sFileInfoInst.sFileName.find('.', nStartFrom);
 
-	std::basic_string<TCHAR> sFile_Info(this->sFileInfoInst.sFileName.substr(nStartFrom, (nLoc - nStartFrom)));
-	std::vector<std::basic_string<TCHAR>> vstFile_Info;
-	std::wsregex_token_iterator itEnd;
-	
-	std::wsregex_token_iterator itwsReg_1(sFile_Info.begin(), sFile_Info.end(), stRegFileStructbyMask, -1);
-	
-	DWORD dwErrorCode = -1;
-	try
-	{
-		for (; itwsReg_1 != itEnd; ++itwsReg_1)
-			vstFile_Info.push_back(*itwsReg_1);
-		if (vstFile_Info.size() >= 5)
-		{
-			this->sFileInfoInst.sFile_ProjectbyName = vstFile_Info[0];
-			this->sFileInfoInst.sFile_CompanyRolebyName = vstFile_Info[1];
-			this->sFileInfoInst.sFile_ProjectStagebyName = vstFile_Info[2];
-			this->sFileInfoInst.sFile_SubsystembyName = vstFile_Info[3];
-			this->sFileInfoInst.sFile_DatatypebyName = vstFile_Info[4];
-		}
-		else
-		{
-			dwErrorCode = 1700;
-			throw dwErrorCode;
-		}
-		dwErrorCode = GetLastError();
-		throw dwErrorCode;
-	}
-	catch (DWORD& dwErrorCode)
-	{
-		switch (dwErrorCode)
-		{
-		case ERROR_SUCCESS:
-		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			break;
-		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
-		}
-	}
-
-	return dwErrorCode;
-};
-DWORD FileProcess::GetFileInfobyFolder()
-{
-	std::basic_string<TCHAR> sFile_Info;
-	std::size_t nLoc = 0;
-	DWORD dwErrorCode = -1;
-	bool bFindStatus = FALSE;
-	//auto itvstFileName = UI::GetUIInst().vstRootFolders.begin();
-	//std::map <std::basic_string<TCHAR>, std::basic_string<TCHAR>> mRootFolders = { {_T("03-Published"), _T("P:")},{ _T("Resources"), _T("R:") },{ _T("02-Shared"), _T("S:") },{ _T("01-WorkInProgress"), _T("W:") }};
-	try
-	{
-		sFile_Info = this->sFileInfoInst.sFileDirPath;
-		//std::wcout << sFile_Info;
-		//for (itvstFileName; itvstFileName != UI::GetUIInst().vstRootFolders.end(); ++itvstFileName)
-		//for (UI::GetUIInst().itRootFolders = UI::GetUIInst().vstRootFolders.begin(); UI::GetUIInst().itRootFolders != UI::GetUIInst().vstRootFolders.end(); ++UI::GetUIInst().itRootFolders)
-		//{
-		//	nLoc = sFile_Info.find(itvstFileName->c_str(), 0);
-		//	if (nLoc != std::basic_string<TCHAR>::npos)
-		//	{
-		//		sFile_Info.erase(0, nLoc + 1);
-		//		bFindStatus = TRUE;
-
-		//		//this->sFileInfoInst.sFileDirPath = sFile_Info;
-		//		//this->sFileInfoInst.sFileDirPath.replace(this->sFileInfoInst.sFileDirPath.find(UI::GetUIInst().itRootFolders->c_str()), UI::GetUIInst().itRootFolders->length(), mRootFolders.at(UI::GetUIInst().itRootFolders->c_str()));
-		//	}
-		//	else
-		//		continue;
-		//	if (bFindStatus == FALSE)
-		//		break;
-		//}
-		//nLoc = 0;
-		//std::wcout << this->sFileInfoInst.sFileDirPath;		
-
-		//Parse file name
-		std::vector<std::basic_string<TCHAR>> vstFile_Info;
-		std::size_t nStartFrom = 0;
-
-		while (nLoc != std::basic_string<TCHAR>::npos)
-		{
-			nLoc = sFile_Info.find('\\', nStartFrom);
-			vstFile_Info.push_back(sFile_Info.substr(nStartFrom, (nLoc - nStartFrom)));
-			sFile_Info.erase(nStartFrom, nLoc + 1);
-		}
-		nLoc = 0;
-		this->sFileInfoInst.sFile_ProjectbyPath = vstFile_Info[1];
-		this->sFileInfoInst.sFile_StageforFL = vstFile_Info[3];
-
-		dwErrorCode = GetLastError();
-		throw dwErrorCode;
-	}
-	catch (DWORD& dwErrorCode)
-	{
-		switch (dwErrorCode)
-		{
-		case ERROR_SUCCESS:
-		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			break;
-		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyFolder(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
-		}
-	}
-
-	return dwErrorCode;
-};
 DWORD FileProcess::ChangeFolderView()
 {
 	std::basic_string<TCHAR> sFile_Info = this->sFileInfoInst.sFileDirPath;
@@ -1055,8 +989,6 @@ DWORD FileProcess::ChangeFolderView()
 	//vstFoldersfromChng_NETSHARE.push_back(_T("\\\\?\\UNC\\000-server-01\\public\\Work"));
 	//std::vector<std::basic_string<TCHAR>> vstFoldersfromChng_NET;
 	//vstFoldersfromChng_NET.push_back(_T("\\\\?\\"));
-	//
-
 	//std::vector<std::basic_string<TCHAR>> vstFolderstoChng_NETSHARE;
 	//vstFolderstoChng_NETSHARE.push_back(_T("W:"));
 	//std::vector<std::basic_string<TCHAR>> vstFolderstoChng_NET;
@@ -1064,7 +996,6 @@ DWORD FileProcess::ChangeFolderView()
 	//std::vector<std::basic_string<TCHAR>>::const_iterator itvstFoldersfromChng = vstFoldersfromChng.begin();
 	//std::vector<std::basic_string<TCHAR>>::const_iterator itvstFoldersfromChng_NETSHARE = vstFoldersfromChng_NETSHARE.begin();
 	//std::vector<std::basic_string<TCHAR>>::const_iterator itvstFoldersfromChng_NET = vstFoldersfromChng_NET.begin();
-
 	//std::vector<std::basic_string<TCHAR>>::const_iterator itvstFolderstoChng = vstFolderstoChng.begin();
 	//std::vector<std::basic_string<TCHAR>>::const_iterator itvstFolderstoChng_NETSHARE = vstFolderstoChng_NETSHARE.begin();
 	//std::vector<std::basic_string<TCHAR>>::const_iterator itvstFolderstoChng_NET = vstFolderstoChng_NET.begin();
@@ -1164,32 +1095,57 @@ DWORD FileProcess::ChangeFolderView()
 	//		}
 	//	}		
 	//}
-	/*else 
-	{*/
+	//else 
+	//{
 		//this->sFileInfoInst.sFileDirPathChngView = sFile_Info;
-		dwErrorCode = GetLastError();
 	//}
-
+	dwErrorCode = GetLastError();
 	return dwErrorCode;
 };
-
-DWORD FileProcess::ChkMask()
+DWORD FileProcess::GetFileInfobyFolder()
 {
-	bool bmatchResult = FALSE;
+	std::basic_string<TCHAR> sFile_Info;
+	std::size_t nLoc = 0;
 	DWORD dwErrorCode = -1;
-	this->sFileInfoInst.iChkMask = -1;
+	bool bFindStatus = FALSE;
+	//auto itvstFileName = UI::GetUIInst().vstRootFolders.begin();
+	//std::map <std::basic_string<TCHAR>, std::basic_string<TCHAR>> mRootFolders = { {_T("03-Published"), _T("P:")},{ _T("Resources"), _T("R:") },{ _T("02-Shared"), _T("S:") },{ _T("01-WorkInProgress"), _T("W:") }};
 	try
 	{
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, this->regFindDStageShaPubZZ);
-		if (bmatchResult == TRUE)
+		sFile_Info = this->sFileInfoInst.sFileDirPath;
+		//std::wcout << sFile_Info;
+		//for (itvstFileName; itvstFileName != UI::GetUIInst().vstRootFolders.end(); ++itvstFileName)
+		//for (UI::GetUIInst().itRootFolders = UI::GetUIInst().vstRootFolders.begin(); UI::GetUIInst().itRootFolders != UI::GetUIInst().vstRootFolders.end(); ++UI::GetUIInst().itRootFolders)
+		//{
+		//	nLoc = sFile_Info.find(itvstFileName->c_str(), 0);
+		//	if (nLoc != std::basic_string<TCHAR>::npos)
+		//	{
+		//		sFile_Info.erase(0, nLoc + 1);
+		//		bFindStatus = TRUE;
+		//		//this->sFileInfoInst.sFileDirPath = sFile_Info;
+		//		//this->sFileInfoInst.sFileDirPath.replace(this->sFileInfoInst.sFileDirPath.find(UI::GetUIInst().itRootFolders->c_str()), UI::GetUIInst().itRootFolders->length(), mRootFolders.at(UI::GetUIInst().itRootFolders->c_str()));
+		//	}
+		//	else
+		//		continue;
+		//	if (bFindStatus == FALSE)
+		//		break;
+		//}
+		//nLoc = 0;
+		//std::wcout << this->sFileInfoInst.sFileDirPath;		
+
+		//Parse file name
+		std::vector<std::basic_string<TCHAR>> vstFile_Info;
+		std::size_t nStartFrom = 0;
+
+		while (nLoc != std::basic_string<TCHAR>::npos)
 		{
-			bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, this->regMaskDStageShaPubZZ);
+			nLoc = sFile_Info.find('\\', nStartFrom);
+			vstFile_Info.push_back(sFile_Info.substr(nStartFrom, (nLoc - nStartFrom)));
+			sFile_Info.erase(nStartFrom, nLoc + 1);
 		}
-		else
-		{
-			bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, this->regMaskCommon);
-		}
-		this->sFileInfoInst.iChkMask = bmatchResult;
+		nLoc = 0;
+		this->sFileInfoInst.sFile_ProjectbyPath = vstFile_Info[1];
+		this->sFileInfoInst.sFile_StageforFL = vstFile_Info[3];
 
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
@@ -1200,17 +1156,17 @@ DWORD FileProcess::ChkMask()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
-			break;
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyFolder(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyFolder(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		}
 	}
 
 	return dwErrorCode;
 };
+
 DWORD FileProcess::ChkCyrillic()
 {
 	BOOL bmatchResult = FALSE;
@@ -1218,9 +1174,10 @@ DWORD FileProcess::ChkCyrillic()
 	this->sFileInfoInst.iChkCyrillic = -1;
 	try
 	{
-		 // [U+0400–U+04FF] // /[À-ßà-ÿ¨¸¿¯³²]/u // [À-ßà-ÿ¨¸¿¯³²] // [\u0400-\u04FF]
+		// [U+0400–U+04FF] // /[À-ßà-ÿ¨¸¿¯³²]/u // [À-ßà-ÿ¨¸¿¯³²] // [\u0400-\u04FF]
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFileName, mrSearchresult, this->regMaskCyrillic);
+		std::basic_regex<TCHAR> regCommon(UI::GetUIInst().vstChk_Cyrillic_fns2.c_str());
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileName, mrSearchresult, regCommon);//this->regMaskCyrillic);
 		if (bmatchResult == FALSE)
 			bmatchResult = TRUE;
 		else
@@ -1236,11 +1193,11 @@ DWORD FileProcess::ChkCyrillic()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic_fsn2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkCyrillic(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkCyrillic_fsn2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkCyrillic_fsn2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		}
 	}
 
@@ -1265,11 +1222,11 @@ DWORD FileProcess::ChkProjectDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		}
 	}
 
@@ -1299,17 +1256,376 @@ DWORD FileProcess::ChkProjectDR()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR_fsn2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkProjectDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkProjectDR_fsn2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects_fsn2(ChkProjectDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
 		}
 	}
-	
+
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkÑompanyDB()
+
+DWORD FileProcess::GetFileInfobyName_fns3()
+{
+	std::size_t nLoc = 0;
+	std::size_t nStartFrom = 0;
+	nLoc = this->sFileInfoInst.sFileName.find('.', nStartFrom);
+
+	std::basic_string<TCHAR> sFile_Info(this->sFileInfoInst.sFileName.substr(nStartFrom, (nLoc - nStartFrom)));
+	std::vector<std::basic_string<TCHAR>> vstFile_Info;
+	std::wsregex_token_iterator itEnd;
+
+	std::wsregex_token_iterator itwsReg_1(sFile_Info.begin(), sFile_Info.end(), stRegFileStructbyMask, -1);
+
+	DWORD dwErrorCode = -1;
+	try
+	{
+		for (; itwsReg_1 != itEnd; ++itwsReg_1)
+			vstFile_Info.push_back(*itwsReg_1);
+		if (vstFile_Info.size() >= 5)
+		{
+			this->sFileInfoInst.sFile_ProjectbyName = vstFile_Info[0];
+			this->sFileInfoInst.sFile_ProjectStagebyName = vstFile_Info[1];
+			this->sFileInfoInst.sFile_BuildingSection = vstFile_Info[2];
+			this->sFileInfoInst.sFile_RolebyName = vstFile_Info[3];
+			this->sFileInfoInst.sFile_SubsystembyName = vstFile_Info[4];
+		}
+		else
+		{
+			dwErrorCode = 1700;
+			throw dwErrorCode;
+		}
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName_fns3(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+};
+DWORD FileProcess::ChkMask_fns3()
+{
+	bool bmatchResult = FALSE;
+	DWORD dwErrorCode = -1;
+	this->sFileInfoInst.iChkMask = -1;
+	try
+	{
+		//fullMask = "^[A-Z]{3}-[A-Z]{1}\\d{2}(\\w)?-\\d{3,5}-[A-Z]{1,4}-[A-Z0-9]{1,3}((-|\\.)[a-zA-Z-\\.]+)?";
+		std::basic_regex<TCHAR> regCommon(UI::GetUIInst().vstChk_FileMaskCommon_fns3.c_str());
+		bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, regCommon);//this->regMaskCommon);
+		this->sFileInfoInst.iChkMask = bmatchResult;
+
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask_fsn3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask_fsn3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask_fsn3(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+			break;
+		}
+	}
+	return dwErrorCode;
+}
+DWORD FileProcess::ChkStageDB_fns3()
+{
+	DWORD dwErrorCode = -1;
+	BOOL bmatchResult = FALSE;
+	this->sFileInfoInst.iChkStageDB = -1;
+	std::basic_string<TCHAR> sStageTMP = this->sFileInfoInst.sFile_ProjectStagebyName;
+	try
+	{
+		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_ProjectStagebyName, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Stage_fns3.c_str());//this->regMaskStage);
+
+		if (mrSearchresult.ready() && bmatchResult != 0)
+		{
+			bmatchResult = FALSE;
+
+			std::transform(sStageTMP.begin(), sStageTMP.end(), sStageTMP.begin(), ::tolower);
+			this->sFileInfoInst.sFile_ProjectStageforDB = this->sFileInfoInst.sFile_ProjectbyName + _T('-') + sStageTMP;
+			this->sFileInfoInst.sFile_StagebyName = sStageTMP;
+			dwErrorCode = DBProcess::dbProcInstance().DBGetStage(this, bmatchResult);
+		}
+		else
+		{
+			bmatchResult = FALSE;
+			return ERROR_INVALID_DATA;
+		}
+		this->sFileInfoInst.iChkStageDB = bmatchResult;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑChkStageDB_fns3(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+}
+DWORD FileProcess::ChkStageDR_fns3()
+{
+	DWORD dwErrorCode = -1;
+	BOOL bmatchResult = FALSE;
+	this->sFileInfoInst.iChkStageDR = -1;
+	try
+	{
+		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_StageforFL, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Stage_fns3.c_str());//this->regMaskStage);
+		this->sFileInfoInst.sFile_StagebyPath = mrSearchresult.str(0);
+		std::transform(this->sFileInfoInst.sFile_StagebyPath.begin(), this->sFileInfoInst.sFile_StagebyPath.end(), this->sFileInfoInst.sFile_StagebyPath.begin(), ::tolower);
+
+		if (this->sFileInfoInst.sFile_StagebyPath != this->sFileInfoInst.sFile_StagebyName)
+			bmatchResult = NULL;
+		else
+			bmatchResult = TRUE;
+		this->sFileInfoInst.iChkStageDR = bmatchResult;
+
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR_fns3(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+}
+DWORD FileProcess::ChkBuildingSection_fns3()
+{
+	DWORD dwErrorCode = -1;
+	BOOL bmatchResult = FALSE;
+	this->sFileInfoInst.iChkBuildingSection = -1;
+	try
+	{
+		std::basic_regex<TCHAR> regCommon(UI::GetUIInst().vstChk_BuildingSection_fns3.c_str());
+		bmatchResult = std::regex_match(this->sFileInfoInst.sFile_BuildingSection, regCommon);//this->regMaskCommon);
+		this->sFileInfoInst.iChkBuildingSection = bmatchResult;
+
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkBuildingSection_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkBuildingSection_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkBuildingSection_fns3(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+}
+DWORD FileProcess::ChkRoleDB_fns3()
+{
+	DWORD dwErrorCode = -1;
+	BOOL bmatchResult = FALSE;
+	this->sFileInfoInst.iChkRoleDB = -1;
+	try
+	{
+		std::basic_regex<TCHAR> regCommon(UI::GetUIInst().vstChk_Role_fns3.c_str());
+		bmatchResult = std::regex_match(this->sFileInfoInst.sFile_RolebyName, regCommon);//this->regMaskCommon);
+
+		if (bmatchResult != FALSE)
+		{
+			dwErrorCode = DBProcess::dbProcInstance().DBGetRole(this, bmatchResult);
+		}
+		else
+		{
+			bmatchResult = FALSE;
+			return ERROR_INVALID_DATA;
+		}
+		this->sFileInfoInst.iChkRoleDB = bmatchResult;
+
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB_fns3(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB_fns3(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+}
+DWORD FileProcess::ChkSubSystemDB_fns3()
+{
+	DWORD dwErrorCode = -1;
+	BOOL bmatchResult = FALSE;
+	this->sFileInfoInst.iChkSubSystemDB = -1;
+	try
+	{
+		std::basic_regex<TCHAR> regCommon(UI::GetUIInst().vstChk_SubSystem_fns3.c_str());
+		bmatchResult = std::regex_match(this->sFileInfoInst.sFile_SubsystembyName, regCommon);//this->regMaskCommon);
+
+		if (bmatchResult != FALSE)
+		{
+			dwErrorCode = DBProcess::dbProcInstance().DBGetSubsystem(this, bmatchResult);
+		}
+		else
+		{
+			bmatchResult = FALSE;
+			return ERROR_INVALID_DATA;
+		}
+		this->sFileInfoInst.iChkSubSystemDB = bmatchResult;
+
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkSubSystemDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkSubSystemDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+}
+
+DWORD FileProcess::GetFileInfobyName_fns2()
+{
+	std::size_t nLoc = 0;
+	std::size_t nStartFrom = 0;
+	nLoc = this->sFileInfoInst.sFileName.find('.', nStartFrom);
+
+	std::basic_string<TCHAR> sFile_Info(this->sFileInfoInst.sFileName.substr(nStartFrom, (nLoc - nStartFrom)));
+	std::vector<std::basic_string<TCHAR>> vstFile_Info;
+	std::wsregex_token_iterator itEnd;
+
+	std::wsregex_token_iterator itwsReg_1(sFile_Info.begin(), sFile_Info.end(), stRegFileStructbyMask, -1);
+
+	DWORD dwErrorCode = -1;
+	try
+	{
+		for (; itwsReg_1 != itEnd; ++itwsReg_1)
+			vstFile_Info.push_back(*itwsReg_1);
+		if (vstFile_Info.size() >= 5)
+		{
+			this->sFileInfoInst.sFile_ProjectbyName = vstFile_Info[0];
+			this->sFileInfoInst.sFile_CompanyRolebyName = vstFile_Info[1];
+			this->sFileInfoInst.sFile_ProjectStagebyName = vstFile_Info[2];
+			this->sFileInfoInst.sFile_SubsystembyName = vstFile_Info[3];
+			this->sFileInfoInst.sFile_DatatypebyName = vstFile_Info[4];
+		}
+		else
+		{
+			dwErrorCode = 1700;
+			throw dwErrorCode;
+		}
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(GetFileInfobyName_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(GetFileInfobyName_fns2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, this->sFileInfoInst.sFileName);
+		}
+	}
+
+	return dwErrorCode;
+};
+DWORD FileProcess::ChkMask_fns2()
+{
+	bool bmatchResult = FALSE;
+	DWORD dwErrorCode = -1;
+	this->sFileInfoInst.iChkMask = -1;
+	try
+	{
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_FindDStageShaPubZZ_fns2.c_str());
+		if (bmatchResult == TRUE)
+		{
+			bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_FileMaskDStageShaPubZZ_fns2.c_str());
+		}
+		else
+		{
+			bmatchResult = std::regex_match(this->sFileInfoInst.sFileName, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_FileMaskCommon_fns2.c_str());//this->regMaskCommon);
+		}
+		this->sFileInfoInst.iChkMask = bmatchResult;
+
+		dwErrorCode = GetLastError();
+		throw dwErrorCode;
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+		case ERROR_NO_MORE_FILES:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask_fsn2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			break;
+		default:
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkMask_fsn2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkMask_fsn2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			break;
+		}
+	}
+
+	return dwErrorCode;
+};
+DWORD FileProcess::ChkÑompanyDB_fns2()
 {
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = FALSE;
@@ -1317,14 +1633,14 @@ DWORD FileProcess::ChkÑompanyDB()
 	try
 	{
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, this->regFindDStageShaPubZZ);
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_FindDStageShaPubZZ_fns2.c_str());
 		if (bmatchResult == TRUE)
 		{
-			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskDCompanyShaPubZZ);
+			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_MaskDCompanyShaPubZZ_fns2.c_str());
 		}
 		else
 		{
-			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskCompany);
+			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Company_fns2.c_str());//this->regMaskCompany);
 		}
 
 		if (mrSearchresult.ready() && bmatchResult != 0)
@@ -1350,17 +1666,17 @@ DWORD FileProcess::ChkÑompanyDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkÑompanyDB_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB_fns2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 	
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkRoleDB()
+DWORD FileProcess::ChkRoleDB_fns2()
 {
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = FALSE;
@@ -1370,7 +1686,7 @@ DWORD FileProcess::ChkRoleDB()
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult2;
 		std::basic_string<TCHAR> sTMP;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, this->regFindDStageShaPubZZ);
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFileDirPathChngView, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_FindDStageShaPubZZ_fns2.c_str());//this->regFindDStageShaPubZZ);
 		if (bmatchResult == TRUE)
 		{
 			this->sFileInfoInst.iChkRoleDB = bmatchResult;
@@ -1379,7 +1695,7 @@ DWORD FileProcess::ChkRoleDB()
 		}
 		else
 		{
-			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, this->regMaskRole);
+			bmatchResult = std::regex_search(this->sFileInfoInst.sFile_CompanyRolebyName, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Role_fns2.c_str()); // this->regMaskRole);
 		}
 		
 		if (mrSearchresult.ready() && bmatchResult != 0)
@@ -1407,17 +1723,17 @@ DWORD FileProcess::ChkRoleDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkRoleDB_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑompanyDB_fns2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkStageDB()
+DWORD FileProcess::ChkStageDB_fns2()
 {
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = FALSE;
@@ -1430,7 +1746,7 @@ DWORD FileProcess::ChkStageDB()
 	try
 	{
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_ProjectStagebyName, mrSearchresult, this->regMaskStage);
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_ProjectStagebyName, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Stage_fns2.c_str());//this->regMaskStage);
 
 		if (mrSearchresult.ready() && bmatchResult != 0)
 		{
@@ -1467,17 +1783,17 @@ DWORD FileProcess::ChkStageDB()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑChkStageDB(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDB_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkÑChkStageDB_fns2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkStageDR()
+DWORD FileProcess::ChkStageDR_fns2()
 {
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = FALSE;
@@ -1485,8 +1801,10 @@ DWORD FileProcess::ChkStageDR()
 	try
 	{
 		std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
-		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_ProjectStagebyName, mrSearchresult, this->regMaskStage);
+		bmatchResult = std::regex_search(this->sFileInfoInst.sFile_ProjectStagebyName, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Stage_fns2.c_str() );//this->regMaskStage);
+		//bmatchResult = std::regex_search(this->sFileInfoInst.sFile_StageforFL, mrSearchresult, (std::basic_regex<TCHAR>) UI::GetUIInst().vstChk_Stage_fns2.c_str());//this->regMaskStage);
 		this->sFileInfoInst.sFile_StagebyPath = mrSearchresult.str(1);
+		//this->sFileInfoInst.sFile_StagebyPath = this->sFileInfoInst.sFile_StageforFL;
 
 		if (this->sFileInfoInst.sFile_StagebyPath != this->sFileInfoInst.sFile_StagebyName)
 			bmatchResult = NULL;
@@ -1503,17 +1821,17 @@ DWORD FileProcess::ChkStageDR()
 		{
 		case ERROR_SUCCESS:
 		case ERROR_NO_MORE_FILES:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
 			break;
 		default:
-			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
-			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->IterProcessFiles(ChkStageDR_fns2(DWORD dwErrorCode)): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ",this->sFileInfoInst.sFileName);
+			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->IterObjects(ChkStageDR_fns2(DWORD dwErrorCode))", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode,this->sFileInfoInst.sFileName);
 		}
 	}
 
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkSubSystemDB()
+DWORD FileProcess::ChkSubSystemDB_fns2()
 {
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = FALSE;
@@ -1543,7 +1861,7 @@ DWORD FileProcess::ChkSubSystemDB()
 
 	return dwErrorCode;
 };
-DWORD FileProcess::ChkDataTypeDB()
+DWORD FileProcess::ChkDataTypeDB_fns2()
 {
 	DWORD dwErrorCode = -1;
 	BOOL bmatchResult = FALSE;

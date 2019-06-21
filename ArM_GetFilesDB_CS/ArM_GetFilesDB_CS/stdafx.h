@@ -39,10 +39,11 @@
 #include <strsafe.h>
 #include <vector>
 #include <algorithm>
-
+#include <codecvt>
 #include <iostream>
 #include <regex>
 #include <string.h>
+
 //#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // some CString constructors will be explicit
 
 //#include <atlbase.h>
@@ -64,12 +65,17 @@
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/foreach.hpp>
+
 #include "UI.h"
 #include "FileProcess.h"
 #include "DBProcess.h"
 #include "Logger.h"
 #include "ErrorHandle.h"
 #include "ConvertStrings.h"
+#include "INI_JSON.h"
 
 #include <assert.h>
 #include <lm.h>
