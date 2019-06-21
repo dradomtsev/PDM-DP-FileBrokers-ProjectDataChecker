@@ -3,28 +3,38 @@
 class UI
 {
 private:
-	std::basic_string<TCHAR> stWorkDir;
-	std::basic_string<TCHAR> stFileINI_Name;// = _T("\\ArM_ChkFile_INI.txt");
-	std::basic_string<TCHAR> stModulePath;
-	
-protected:
-	UI(const UI&);                 // Prevent copy-construction
-	UI& operator=(const UI&);      // Prevent assignment
 	UI();
 	~UI();
+	UI(const UI&) = delete;                 // Prevent copy-construction
+	UI& operator=(const UI&) = delete;      // Prevent assignment
+protected:
 public:
 	friend class FileProcess;
 	friend class Logger;
 	friend class DBProcess;
-	static UI* GetUIInst();
+
+	static UI& GetUIInst()
+	{
+		static UI UIInst;
+		return UIInst;
+	};
+	//const std::basic_string<TCHAR>& GetString()	{return stFileINI_Name;	}
+		
 	DWORD FindExePath();
 	DWORD InitbyINI();
 	DWORD ConvertDateTime();
+	DWORD InitReviewPeriod();
+
+	std::basic_string<TCHAR> stWorkDir;
+	std::basic_string<TCHAR> stFileINI_Name;
+	std::basic_string<TCHAR> stModuleName;
+	std::basic_string<TCHAR> stModulePath;
+	
 
 	SYSTEMTIME stStartChkPeriod;
 	SYSTEMTIME stEndChkPeriod;
-
-	std::basic_string<TCHAR> stModuleName;
+	FILETIME	tStartChkPeriod;
+	FILETIME	tEndChkPeriod;
 
 	std::vector<std::basic_string<TCHAR>> vstFolderstoParse;
 	std::vector<std::basic_string<TCHAR>>::iterator itFolderstoParse;
@@ -57,13 +67,36 @@ public:
 	std::basic_string<TCHAR> vstDatatypesTableName;
 	std::vector<std::basic_string<TCHAR>> vstDatatypesTableFields;
 
-	std::basic_string<TCHAR> vstMySQl_Hostname;
-	std::basic_string<TCHAR> vstMySQl_Login;
-	std::basic_string<TCHAR> vstMySQl_Password;
-	std::basic_string<TCHAR> vstMySQl_DefSchema;
-	std::basic_string<TCHAR> vstChk_FileMaskCommon;
-	std::basic_string<TCHAR> vstChk_Cyrillic;
-	std::basic_string<TCHAR> vstChk_Company;
-	std::basic_string<TCHAR> vstChk_Role;
-	std::basic_string<TCHAR> vstChk_Stage;
+	std::basic_string<TCHAR> stMySQl_Hostname;
+	std::basic_string<TCHAR> stMySQl_Login;
+	std::basic_string<TCHAR> stMySQl_Password;
+	std::basic_string<TCHAR> stMySQl_DefSchema;
+
+	std::vector<std::basic_string<TCHAR>> vstProjectsInclude_fns2;
+	std::vector<std::basic_string<TCHAR>> vstProjectsExclude_fns2;
+	std::basic_string<TCHAR> vstChk_FileMaskCommon_fns2;
+	std::basic_string<TCHAR> vstChk_Cyrillic_fns2;
+	std::basic_string<TCHAR> vstChk_Company_fns2;
+	std::basic_string<TCHAR> vstChk_Role_fns2;
+	std::basic_string<TCHAR> vstChk_Stage_fns2;
+	std::basic_string<TCHAR> vstChk_BuildingSection_fns2;
+	std::basic_string<TCHAR> vstChk_SubSystem_fns2;
+
+	std::basic_string<TCHAR> vstChk_FindDStageShaPubZZ_fns2;
+	std::basic_string<TCHAR> vstChk_FileMaskDStageShaPubZZ_fns2;
+	std::basic_string<TCHAR> vstChk_MaskDCompanyShaPubZZ_fns2;
+
+	std::vector<std::basic_string<TCHAR>> vstProjectsInclude_fns3;
+	std::vector<std::basic_string<TCHAR>> vstProjectsExclude_fns3;
+	std::basic_string<TCHAR> vstChk_FileMaskCommon_fns3;
+	std::basic_string<TCHAR> vstChk_Cyrillic_fns3;
+	std::basic_string<TCHAR> vstChk_Company_fns3;
+	std::basic_string<TCHAR> vstChk_Role_fns3;
+	std::basic_string<TCHAR> vstChk_Stage_fns3;
+	std::basic_string<TCHAR> vstChk_BuildingSection_fns3;
+	std::basic_string<TCHAR> vstChk_SubSystem_fns3;
+
+	std::basic_string<TCHAR> vstChk_FindDStageShaPubZZ_fns3;
+	std::basic_string<TCHAR> vstChk_FileMaskDStageShaPubZZ_fns3;
+	std::basic_string<TCHAR> vstChk_MaskDCompanyShaPubZZ_fns3;
 };

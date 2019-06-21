@@ -9,9 +9,9 @@ ConvertStrings * ConvertStrings::GetConvStrInst()
 	static ConvertStrings ConvStrInst;
 	return &ConvStrInst;
 };
-std::basic_string<TCHAR> AnsiStringToUnicodeString(std::string stIn)
+DWORD AnsiStringToUnicodeString(const std::string &stIn, std::basic_string<TCHAR> &wstOut)
 {
-	std::basic_string<TCHAR> wstOut;
+	//std::basic_string<TCHAR> wstOut;
 	DWORD dwErrorCode = -1;
 	SetLastError(ERROR_SUCCESS);
 	setlocale(LC_ALL, "");
@@ -43,12 +43,12 @@ std::basic_string<TCHAR> AnsiStringToUnicodeString(std::string stIn)
 		}
 
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
 		case ERROR_SUCCESS:
-			return wstOut;
+			break;
 		case ERROR_INSUFFICIENT_BUFFER:
 		case ERROR_INVALID_FLAGS:
 		case ERROR_INVALID_PARAMETER:
@@ -56,13 +56,15 @@ std::basic_string<TCHAR> AnsiStringToUnicodeString(std::string stIn)
 		{
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->AnsiStringToUnicodeString(WideCharToMultiByte()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", stIn);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("AnsiStringToUnicodeString->WideCharToMultiByte()"), (LPTSTR)stIn.c_str(), dwErrorCode);
+			break;
 		}
 		}
 	}
+	return dwErrorCode;
 };
-std::string ConvertStrings::UnicodeStringToAnsiString(std::basic_string<TCHAR> wstIn)
+DWORD ConvertStrings::UnicodeStringToAnsiString(const std::basic_string<TCHAR> &wstIn, std::string &stOut)
 {
-	std::string stOut;
+	//std::string stOut;
 	DWORD dwErrorCode = -1;
 	SetLastError(ERROR_SUCCESS);
 	setlocale(LC_ALL, "");
@@ -92,12 +94,12 @@ std::string ConvertStrings::UnicodeStringToAnsiString(std::basic_string<TCHAR> w
 		}
 
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
 			case ERROR_SUCCESS:
-				return stOut;
+				break;
 			case ERROR_INSUFFICIENT_BUFFER:
 			case ERROR_INVALID_FLAGS:
 			case ERROR_INVALID_PARAMETER:
@@ -105,19 +107,22 @@ std::string ConvertStrings::UnicodeStringToAnsiString(std::basic_string<TCHAR> w
 			{
 				Logger::GetLogInstance()->PrepareTXTLOG("Function->UnicodeStringToAnsiString(WideCharToMultiByte()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", wstIn);
 				ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("UnicodeStringToAnsiString->WideCharToMultiByte()"), (LPTSTR)wstIn.c_str(), dwErrorCode);
+				break;
 			}
 		}
 	}
+	return dwErrorCode;
 };
-std::vector<std::string> ConvertStrings::UnicodeVectorToAnsiVector(std::vector<std::basic_string<TCHAR>> wstIn)
+DWORD ConvertStrings::UnicodeVectorToAnsiVector(const std::vector<std::basic_string<TCHAR>> &wstIn, std::vector<std::string> &vstOut)
 {
-	std::vector<std::string> stOut(wstIn.size());
+	//std::vector<std::string> stOut(wstIn.size());
+	vstOut.resize(wstIn.size());
 	DWORD dwErrorCode = -1;
 	SetLastError(ERROR_SUCCESS);
 	std::size_t i = 0;
 	try 
 	{
-		for (std::vector<std::basic_string<TCHAR>>::iterator it = wstIn.begin(); it != wstIn.end(); ++it, ++i)
+		for (std::vector<std::basic_string<TCHAR>>::const_iterator it = wstIn.begin(); it != wstIn.end(); ++it, ++i)
 		{
 			std::size_t iCharSize = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, it->c_str(), -1, nullptr, 0, NULL, NULL);
 			if (iCharSize == 0)
@@ -127,8 +132,9 @@ std::vector<std::string> ConvertStrings::UnicodeVectorToAnsiVector(std::vector<s
 			}
 			else
 			{
-				stOut.at(i).resize(iCharSize);
-				iCharSize = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, it->c_str(), -1, &stOut.at(i)[0], (int)iCharSize, NULL, NULL);
+				//vstOut.at(i).assign(" ");
+				vstOut.at(i).resize(iCharSize);
+				iCharSize = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, it->c_str(), -1, &vstOut.at(i)[0], (int)iCharSize, NULL, NULL);
 				if (iCharSize == 0)
 				{
 					dwErrorCode = GetLastError();
@@ -136,19 +142,19 @@ std::vector<std::string> ConvertStrings::UnicodeVectorToAnsiVector(std::vector<s
 				}
 				else
 				{
-					stOut.at(i).resize(iCharSize - 1);
+					vstOut.at(i).resize(iCharSize - 1);
 				}
 			}
 		}
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
 			case ERROR_SUCCESS:
-				return stOut;
+				break;
 			case ERROR_INSUFFICIENT_BUFFER:
 			case ERROR_INVALID_FLAGS:
 			case ERROR_INVALID_PARAMETER:
@@ -156,7 +162,69 @@ std::vector<std::string> ConvertStrings::UnicodeVectorToAnsiVector(std::vector<s
 			{
 				Logger::GetLogInstance()->PrepareTXTLOG("Function->UnicodeStringToAnsiString(WideCharToMultiByte()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", wstIn.at(i));
 				ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("UnicodeStringToAnsiString->WideCharToMultiByte()"), (LPTSTR)wstIn.at(i).c_str(), dwErrorCode);
+				break;
 			}
 		}
 	}
+	return dwErrorCode;
 };
+
+DWORD ConvertStrings::s2ws(const std::string& stIn, std::wstring &wstOut)
+{
+	DWORD dwErrorCode = -1;
+	SetLastError(ERROR_SUCCESS);
+	try
+	{
+		using convert_typeX = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_typeX, wchar_t> converterX;
+		wstOut = converterX.from_bytes(stIn);
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+			break;
+		case ERROR_INSUFFICIENT_BUFFER:
+		case ERROR_INVALID_FLAGS:
+		case ERROR_INVALID_PARAMETER:
+		case ERROR_NO_UNICODE_TRANSLATION:
+		{
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->s2ws(): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", stIn);
+			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("s2ws()"), (LPTSTR)stIn.c_str(), dwErrorCode);
+			break;
+		}
+		}
+	}
+	return dwErrorCode;
+}
+
+DWORD ConvertStrings::ws2s(const std::wstring& wstIn, std::string &stOut)
+{
+	DWORD dwErrorCode = -1;
+	SetLastError(ERROR_SUCCESS);
+	try
+	{
+		using convert_typeX = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_typeX, wchar_t> converterX;
+		stOut = converterX.to_bytes(wstIn);
+	}
+	catch (DWORD& dwErrorCode)
+	{
+		switch (dwErrorCode)
+		{
+		case ERROR_SUCCESS:
+			break;
+		case ERROR_INSUFFICIENT_BUFFER:
+		case ERROR_INVALID_FLAGS:
+		case ERROR_INVALID_PARAMETER:
+		case ERROR_NO_UNICODE_TRANSLATION:
+		{
+			Logger::GetLogInstance()->PrepareTXTLOG("Function->s2ws(): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", wstIn);
+			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("s2ws()"), (LPTSTR)wstIn.c_str(), dwErrorCode);
+			break;
+		}
+		}
+	}
+	return dwErrorCode;
+}

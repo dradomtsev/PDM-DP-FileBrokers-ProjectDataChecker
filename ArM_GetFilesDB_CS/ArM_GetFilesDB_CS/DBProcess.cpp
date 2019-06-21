@@ -4,47 +4,119 @@
 
 DBProcess::DBProcess() 
 {
-	MySQLConnectionInst.stTCIP.assign(				ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstMySQl_Hostname));
-	MySQLConnectionInst.stLogin.assign(				ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstMySQl_Login));
-	MySQLConnectionInst.stPassword.assign(			ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstMySQl_Password));
-	MySQLConnectionInst.stSchemaName.assign(		ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstMySQl_DefSchema));
+	DWORD dwErrorCode = 0;
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_Hostname, MySQLConnectionInst.stTCIP);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_Login, MySQLConnectionInst.stLogin);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_Password, MySQLConnectionInst.stPassword);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().stMySQl_DefSchema, MySQLConnectionInst.stSchemaName);
 
-	stMySQLTableErrors.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstErrorsTableName));
-	stMySQLTableErrors.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstErrorsTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstErrorsTableName, stMySQLTableErrors.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstErrorsTableFields, stMySQLTableErrors.stMySQLTable_fields);
 
-	stMySQLTableExtens.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstExtensTableName));
-	stMySQLTableExtens.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstExtensTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstExtensTableName, stMySQLTableExtens.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstExtensTableFields, stMySQLTableExtens.stMySQLTable_fields);
 
-	stMySQLTableFiles.stMySQLTable_name.assign(		ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstFilesTableName));
-	stMySQLTableFiles.stMySQLTable_fields =			ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstFilesTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstFilesTableName, stMySQLTableFiles.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstFilesTableFields, stMySQLTableFiles.stMySQLTable_fields);
 
-	stMySQLTableFolders.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstFoldersTableName));
-	stMySQLTableFolders.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstFoldersTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstFoldersTableName, stMySQLTableFolders.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstFoldersTableFields, stMySQLTableFolders.stMySQLTable_fields);
 
-	stMySQLTableUsers.stMySQLTable_name.assign(		ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstUsersTableName));
-	stMySQLTableUsers.stMySQLTable_fields =			ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstUsersTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstUsersTableName, stMySQLTableUsers.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstUsersTableFields, stMySQLTableUsers.stMySQLTable_fields);
 
-	stMySQLTableProjects.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstProjectsTableName));
-	stMySQLTableProjects.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstProjectsTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstProjectsTableName, stMySQLTableProjects.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstProjectsTableFields, stMySQLTableProjects.stMySQLTable_fields);
 
-	stMySQLTableCompanies.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstCompaniesTableName));
-	stMySQLTableCompanies.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstCompaniesTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstCompaniesTableName, stMySQLTableCompanies.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstCompaniesTableFields, stMySQLTableCompanies.stMySQLTable_fields);
 
-	stMySQLTableRole.stMySQLTable_name.assign(		ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstRolesTableName));
-	stMySQLTableRole.stMySQLTable_fields =			ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstRolesTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstRolesTableName, stMySQLTableRole.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstRolesTableFields, stMySQLTableRole.stMySQLTable_fields);
 
-	stMySQLTableSubsystem.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstSubsystemsTableName));
-	stMySQLTableSubsystem.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstSubsystemsTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstSubsystemsTableName, stMySQLTableSubsystem.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstSubsystemsTableFields, stMySQLTableSubsystem.stMySQLTable_fields);
 
-	stMySQLTableDatatype.stMySQLTable_name.assign(	ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst()->vstDatatypesTableName));
-	stMySQLTableDatatype.stMySQLTable_fields =		ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst()->vstDatatypesTableFields);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(UI::GetUIInst().vstDatatypesTableName, stMySQLTableDatatype.stMySQLTable_name);
+	dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeVectorToAnsiVector(UI::GetUIInst().vstDatatypesTableFields, stMySQLTableDatatype.stMySQLTable_fields);
 };
 DBProcess::~DBProcess() {};
-DBProcess * DBProcess::dbProcInstance()
-{
-	static DBProcess dbProcInst;
-	return &dbProcInst;
-};
+
+//DWORD FileProcess::StartMySQLConect()
+//{
+//	DWORD dwErrorCode = -1;
+//	SetLastError(ERROR_SUCCESS);
+//	//2. Init MYSQL driver & create connection
+//	try
+//	{
+//		dwErrorCode = DBProcess::dbProcInstance().DBCreateMYSQLConnection();
+//		throw  dwErrorCode;
+//	}
+//	catch (DWORD& dwErrorCode)
+//	{
+//		switch (dwErrorCode)
+//		{
+//		case ERROR_SUCCESS:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->StartMySQLConect(DBCreateMYSQLConnection()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", "MySQL Connection");
+//			break;
+//		default:
+//			DBProcess::dbProcInstance().DBCloseMYSQLConnection();
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->StartMySQLConect(DBCreateMYSQLConnection()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", "MySQL Connection");
+//			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("StartMySQLConect(DBCreateMYSQLConnection())"), _T("."), dwErrorCode);
+//		}
+//	}
+//	return dwErrorCode;
+//};
+//DWORD FileProcess::InitMySQLConect()
+//{
+//	DWORD dwErrorCode = -1;
+//	SetLastError(ERROR_SUCCESS);
+//	//3. Init MySQL tables by trancation
+//	try
+//	{
+//		dwErrorCode = DBProcess::dbProcInstance().DBInitTables();
+//		throw  dwErrorCode;
+//	}
+//	catch (DWORD& dwErrorCode)
+//	{
+//		switch (dwErrorCode)
+//		{
+//		case ERROR_SUCCESS:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->InitMySQLConect(DBInitTables()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", "MySQL tables");
+//			break;
+//		default:
+//			DBProcess::dbProcInstance().DBCloseMYSQLConnection();
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->InitMySQLConect(DBInitTables()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", "MySQL tables");
+//			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("InitMySQLConect(DBInitTables())"), _T("."), dwErrorCode);
+//		}
+//	}
+//	return dwErrorCode;
+//};
+//DWORD FileProcess::CloseMySQLConect()
+//{
+//	DWORD dwErrorCode = -1;
+//	SetLastError(ERROR_SUCCESS);
+//	//5. Close MYSQL connection
+//	try
+//	{
+//		dwErrorCode = DBProcess::dbProcInstance().DBCloseMYSQLConnection();
+//		throw  dwErrorCode;
+//	}
+//	catch (DWORD& dwErrorCode)
+//	{
+//		switch (dwErrorCode)
+//		{
+//		case ERROR_SUCCESS:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->CloseMySQLConect(DBCloseMYSQLConnection()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", "MySQL tables");
+//			break;
+//		default:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->CloseMySQLConect(DBCloseMYSQLConnection()): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", "MySQL tables");
+//			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("DBCloseMYSQLConnection(DBCloseMYSQLConnection())"), _T("."), dwErrorCode);
+//		}
+//	}
+//	return dwErrorCode;
+//};
+
 DWORD DBProcess::DBCreateMYSQLConnection()
 {
 	DWORD dwErrorCode = -1;
@@ -69,7 +141,7 @@ DWORD DBProcess::DBCreateMYSQLConnection()
 		Logger::GetLogInstance()->PrepareMySQLLOG("Error connect to MySQL driver", "Function->DBCreateMYSQLConnection()", e.what(), e.getErrorCode(), e.getSQLState());
 		Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCreateMYSQLConnection() -> MySQL error: ", e.what(), "MySQL error code: ", e.getErrorCode(), "SQLState: ", e.getSQLState());
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
@@ -92,24 +164,23 @@ DWORD DBProcess::DBInitTables()
 		//pstmtInit = con->prepareStatement("CREATE TABLE fileInfo (dbName VARCHAR(255) NOT NULL, dbFileRoot VARCHAR(255) NOT NULL, dbFileOwnerName VARCHAR(255) NOT NULL, dbFileSize INT NOT NULL, dbCreateDate DATE DEFAULT'1000-01-01' NOT NULL, dbCreateTime TIME DEFAULT'-838:59:59' NOT NULL, dbAccessDate DATE DEFAULT'1000-01-01' NOT NULL, dbAccessTime TIME DEFAULT'-838:59:59' NOT NULL, dbWriteDate DATE DEFAULT'1000-01-01' NOT NULL, dbWriteTime TIME DEFAULT'-838:59:59' NOT NULL);");
 		std::shared_ptr<sql::Statement> stmt;
 		std::string stMySQLST_Truncate("TRUNCATE TABLE ");
-
 		std::string stMySQLST_TruncateTable = stMySQLST_Truncate + stMySQLTableExtens.stMySQLTable_name + ";";
 		stmt.reset(con->createStatement());
-		stmt->execute(stMySQLST_TruncateTable);
+		stmt->execute(stMySQLST_TruncateTable.c_str());
 		stMySQLST_TruncateTable.clear();
 		stmt->close();
 		stmt.reset();
 
 		stMySQLST_TruncateTable = stMySQLST_Truncate + stMySQLTableFiles.stMySQLTable_name + ";";
 		stmt.reset(con->createStatement());
-		stmt->execute(stMySQLST_TruncateTable);
+		stmt->execute(stMySQLST_TruncateTable.c_str());
 		stMySQLST_TruncateTable.clear();
 		stmt->close();
 		stmt.reset();
 
 		stMySQLST_TruncateTable = stMySQLST_Truncate + stMySQLTableFolders.stMySQLTable_name + ";";
 		stmt.reset(con->createStatement());
-		stmt->execute(stMySQLST_TruncateTable);
+		stmt->execute(stMySQLST_TruncateTable.c_str());
 		stMySQLST_TruncateTable.clear();
 		stmt->close();
 		stmt.reset();
@@ -122,7 +193,7 @@ DWORD DBProcess::DBInitTables()
 		Logger::GetLogInstance()->PrepareMySQLLOG("Error truncate MySQL tables", "Function->DBInitTables()", e.what(), e.getErrorCode(), e.getSQLState());
 		Logger::GetLogInstance()->PrepareTXTLOG("Function->DBInitTables(TRUNCATE TABLES) -> MySQL error: ", e.what(), "MySQL error code: ", e.getErrorCode(), "SQLState: ", e.getSQLState());
 	}
-	catch (DWORD dwErrorCode)
+	catch (DWORD& dwErrorCode)
 	{
 		switch (dwErrorCode)
 		{
@@ -144,17 +215,20 @@ DWORD DBProcess::DBWriteFolders(FileProcess *fpInst)
 	//INSERT INTO portal.folders
 	try
 	{
-		std::string sFileDirPathTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileDirPathChngView);
+		std::string sFileDirPathTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileDirPathChngView, sFileDirPathTMP);
+		if (dwErrorCode == 0)
+		{
+			std::string stMySQLST_Insert("INSERT INTO tablename (field) VALUES (?);");
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableFolders.stMySQLTable_name);
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field"), std::string("field").length(), stMySQLTableFolders.stMySQLTable_fields.at(0));
+			pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert.c_str()));//folders_bak folders
+			pstmtWrite->setString(1, sFileDirPathTMP.c_str());
+			pstmtWrite->execute();
+			pstmtWrite->close();
 
-		std::string stMySQLST_Insert("INSERT INTO tablename (field) VALUES (?);");
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"),std::string("tablename").length(),	stMySQLTableFolders.stMySQLTable_name);
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field"),	std::string("field").length(),		stMySQLTableFolders.stMySQLTable_fields.at(0));
-		pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert));//folders_bak folders
-		pstmtWrite->setString(1, sFileDirPathTMP);	
-		pstmtWrite->execute();
-		pstmtWrite->close();
-
-		pstmtWrite.reset();
+			pstmtWrite.reset();
+		}
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}
@@ -186,18 +260,20 @@ DWORD DBProcess::DBWriteExtensions(FileProcess *fpInst)
 	// INSERT INTO portal.extensions
 	try
 	{
-		std::string sFileExtensionTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileExtension);
+		std::string sFileExtensionTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileExtension, sFileExtensionTMP);
+		if (dwErrorCode == 0)
+		{
+			std::string stMySQLST_Insert("INSERT INTO tablename (field) VALUES (?);");
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableExtens.stMySQLTable_name);
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field"), std::string("field").length(), stMySQLTableExtens.stMySQLTable_fields.at(0));
+			pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert.c_str()));// extensions extensions_bak
+			pstmtWrite->setString(1, sFileExtensionTMP.c_str());
+			pstmtWrite->execute();
+			pstmtWrite->close();
 
-		std::string stMySQLST_Insert("INSERT INTO tablename (field) VALUES (?);");
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"),std::string("tablename").length(),	stMySQLTableExtens.stMySQLTable_name);
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field"),	std::string("field").length(),		stMySQLTableExtens.stMySQLTable_fields.at(0));
-		pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert));// extensions extensions_bak
-		pstmtWrite->setString(1, sFileExtensionTMP);
-		pstmtWrite->execute();
-		pstmtWrite->close();
-
-		pstmtWrite.reset();
-
+			pstmtWrite.reset();
+		}
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}
@@ -233,35 +309,38 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 	// Get from portal.files
 	try
 	{
-		std::string sFileExtensionTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileExtension);
+		std::string sFileExtensionTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileExtension, sFileExtensionTMP);
 
 		std::string stMySQLST_Select("SELECT id FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"),std::string("tablename").length(),	stMySQLTableExtens.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"),	std::string("field").length(),		stMySQLTableExtens.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFileExtensionTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		pstmtGet->setString(1, sFileExtensionTMP.c_str());
 		resGet.reset( pstmtGet->executeQuery() );
 		pstmtGet->close();
 		while (resGet->next()) { iExtension_ID = resGet->getInt(1); };
 
-		std::string sFileFolderTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileDirPathChngView);
+		std::string sFileFolderTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileDirPathChngView, sFileFolderTMP);
 
 		stMySQLST_Select.assign("SELECT id FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"),std::string("tablename").length(),	stMySQLTableFolders.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"),	std::string("field").length(),		stMySQLTableFolders.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// folders_bak folders
-		pstmtGet->setString(1, sFileFolderTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// folders_bak folders
+		pstmtGet->setString(1, sFileFolderTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next()) { iFolder_ID = resGet->getInt(1); };
 
-		std::string ssFileUserTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileOwnerName);
+		std::string ssFileUserTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileOwnerName, ssFileUserTMP);
 
 		stMySQLST_Select.assign("SELECT id FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"),std::string("tablename").length(),	stMySQLTableUsers.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"),	std::string("field").length(),		stMySQLTableUsers.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));
-		pstmtGet->setString(1, ssFileUserTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));
+		pstmtGet->setString(1, ssFileUserTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next()) { iUser_ID = resGet->getInt(1); };
@@ -295,64 +374,74 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 	std::shared_ptr<sql::PreparedStatement> pstmtWrite;
 	try
 	{
-		std::string sFileSize, sTime_create, sTime_write;
+		std::string sFileSize;// , sTime_create, sTime_write;
 		sFileSize.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileSize.QuadPart));
-		sTime_create.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_create));
-		sTime_write.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_write));
+		//sTime_create.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_create));
+		//sTime_write.insert	(0, std::to_string(fpInst->sFileInfoInst.sFileCAWTime.i64Time_write));
 
 		//std::basic_string<TCHAR> stPathFilename;
 		//stPathFilename.insert(0, fpInst->sFileInfoInst.sFileDirPath);
 		//stPathFilename.append(fpInst->sFileInfoInst.sFileName);
 		//std::string sFileDirPathTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(stPathFilename);
-		std::string sFileNameTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileName);
+		std::string sFileNameTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFileName, sFileNameTMP);
+		if (dwErrorCode == 0)
+		{
+			std::string stMySQLST_Insert("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16, field_17, field_18, field_19) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableFiles.stMySQLTable_name);
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_0"), std::string("field_0").length(), stMySQLTableFiles.stMySQLTable_fields.at(0));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_1"), std::string("field_1").length(), stMySQLTableFiles.stMySQLTable_fields.at(1));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_2"), std::string("field_2").length(), stMySQLTableFiles.stMySQLTable_fields.at(2));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_3"), std::string("field_3").length(), stMySQLTableFiles.stMySQLTable_fields.at(3));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_4"), std::string("field_4").length(), stMySQLTableFiles.stMySQLTable_fields.at(4));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_5"), std::string("field_5").length(), stMySQLTableFiles.stMySQLTable_fields.at(5));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_6"), std::string("field_6").length(), stMySQLTableFiles.stMySQLTable_fields.at(6));
 
-		std::string stMySQLST_Insert ("INSERT INTO tablename (field_0, field_1, field_2, field_3, field_4, field_5, field_6, field_7, field_8, field_9, field_10, field_11, field_12, field_13, field_14, field_15, field_16) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("tablename"), std::string("tablename").length(), stMySQLTableFiles.stMySQLTable_name);
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_0"), std::string("field_0").length(), stMySQLTableFiles.stMySQLTable_fields.at(0));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_1"), std::string("field_1").length(), stMySQLTableFiles.stMySQLTable_fields.at(1));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_2"), std::string("field_2").length(), stMySQLTableFiles.stMySQLTable_fields.at(2));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_3"), std::string("field_3").length(), stMySQLTableFiles.stMySQLTable_fields.at(3));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_4"), std::string("field_4").length(), stMySQLTableFiles.stMySQLTable_fields.at(4));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_5"), std::string("field_5").length(), stMySQLTableFiles.stMySQLTable_fields.at(5));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_6"), std::string("field_6").length(), stMySQLTableFiles.stMySQLTable_fields.at(6));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_7"), std::string("field_7").length(), stMySQLTableFiles.stMySQLTable_fields.at(7));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_8"), std::string("field_8").length(), stMySQLTableFiles.stMySQLTable_fields.at(8));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_9"), std::string("field_9").length(), stMySQLTableFiles.stMySQLTable_fields.at(9));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_10"), std::string("field_10").length(), stMySQLTableFiles.stMySQLTable_fields.at(10));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_11"), std::string("field_11").length(), stMySQLTableFiles.stMySQLTable_fields.at(11));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_12"), std::string("field_12").length(), stMySQLTableFiles.stMySQLTable_fields.at(12));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_13"), std::string("field_13").length(), stMySQLTableFiles.stMySQLTable_fields.at(13));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_14"), std::string("field_14").length(), stMySQLTableFiles.stMySQLTable_fields.at(14));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_15"), std::string("field_15").length(), stMySQLTableFiles.stMySQLTable_fields.at(15));
 
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_7"), std::string("field_7").length(), stMySQLTableFiles.stMySQLTable_fields.at(7));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_8"), std::string("field_8").length(), stMySQLTableFiles.stMySQLTable_fields.at(8));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_9"), std::string("field_9").length(), stMySQLTableFiles.stMySQLTable_fields.at(9));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_10"), std::string("field_10").length(), stMySQLTableFiles.stMySQLTable_fields.at(10));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_11"), std::string("field_11").length(), stMySQLTableFiles.stMySQLTable_fields.at(11));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_12"), std::string("field_12").length(), stMySQLTableFiles.stMySQLTable_fields.at(12));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_13"), std::string("field_13").length(), stMySQLTableFiles.stMySQLTable_fields.at(13));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_14"), std::string("field_14").length(), stMySQLTableFiles.stMySQLTable_fields.at(14));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_15"), std::string("field_15").length(), stMySQLTableFiles.stMySQLTable_fields.at(15));
-		stMySQLST_Insert.replace(stMySQLST_Insert.find("field_16"), std::string("field_16").length(), stMySQLTableFiles.stMySQLTable_fields.at(16));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_16"), std::string("field_16").length(), stMySQLTableFiles.stMySQLTable_fields.at(16));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_17"), std::string("field_17").length(), stMySQLTableFiles.stMySQLTable_fields.at(17));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_18"), std::string("field_18").length(), stMySQLTableFiles.stMySQLTable_fields.at(18));
+			stMySQLST_Insert.replace(stMySQLST_Insert.find("field_19"), std::string("field_19").length(), stMySQLTableFiles.stMySQLTable_fields.at(19));
 
-		pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert));
-		pstmtWrite->setString	(1, sFileNameTMP);
-		pstmtWrite->setInt		(2, (int32_t)iExtension_ID);
-		pstmtWrite->setInt		(3, (int32_t)iFolder_ID);
-		pstmtWrite->setInt		(4, (int32_t)iUser_ID);
-		pstmtWrite->setString	(5, sFileSize);
-		
-		pstmtWrite->setInt		(6, fpInst->sFileInfoInst.iChkMask);
-		pstmtWrite->setInt		(7, fpInst->sFileInfoInst.iChkCyrillic);
-		pstmtWrite->setInt		(8, fpInst->sFileInfoInst.iChkProjectDB);
-		pstmtWrite->setInt		(9, fpInst->sFileInfoInst.iChkProjectDR);
-		pstmtWrite->setInt		(10, fpInst->sFileInfoInst.iChkÑompanyDB);
-		pstmtWrite->setInt		(11, fpInst->sFileInfoInst.iChkRoleDB);
-		pstmtWrite->setInt		(12, fpInst->sFileInfoInst.iChkStageDB);
-		pstmtWrite->setInt		(13, fpInst->sFileInfoInst.iChkStageDR);
-		pstmtWrite->setInt		(14, fpInst->sFileInfoInst.iChkSubSystemDB);
-		pstmtWrite->setInt		(15, fpInst->sFileInfoInst.iChkDataTypeDB);
+			pstmtWrite.reset(con->prepareStatement(stMySQLST_Insert.c_str()));
+			pstmtWrite->setString	(1, sFileNameTMP.c_str());
+			pstmtWrite->setInt		(2, (int32_t)iExtension_ID);
+			pstmtWrite->setInt		(3, (int32_t)iFolder_ID);
+			pstmtWrite->setInt		(4, (int32_t)iUser_ID);
+			pstmtWrite->setString	(5, sFileSize.c_str());
 
-		pstmtWrite->setInt64	(16, fpInst->sFileInfoInst.sFileCAWTime.i64Time_create);
-		pstmtWrite->setInt64	(17, fpInst->sFileInfoInst.sFileCAWTime.i64Time_write);
+			pstmtWrite->setInt		(6, fpInst->sFileInfoInst.iChkMask);
+			pstmtWrite->setInt		(7, fpInst->sFileInfoInst.iChkCyrillic);
+			pstmtWrite->setInt		(8, fpInst->sFileInfoInst.iChkProjectDB);
+			pstmtWrite->setInt		(9, fpInst->sFileInfoInst.iChkProjectDR);
+			pstmtWrite->setInt		(10, fpInst->sFileInfoInst.iChkÑompanyDB);
+			pstmtWrite->setInt		(11, fpInst->sFileInfoInst.iChkRoleDB);
+			pstmtWrite->setInt		(12, fpInst->sFileInfoInst.iChkStageDB);
 
-		pstmtWrite->execute();
-		pstmtWrite->close();
+			pstmtWrite->setInt		(13, fpInst->sFileInfoInst.iChkStageDR);
+			pstmtWrite->setInt		(14, fpInst->sFileInfoInst.iChkSubSystemDB);
+			pstmtWrite->setInt		(15, fpInst->sFileInfoInst.iChkDataTypeDB);
+			pstmtWrite->setInt		(16, fpInst->sFileInfoInst.iChkBuildingSection);
 
-		pstmtWrite.reset();
+			pstmtWrite->setInt64(17, fpInst->sFileInfoInst.sFileCAWTime.i64Time_create);
+			pstmtWrite->setInt64(18, fpInst->sFileInfoInst.sFileCAWTime.i64Time_write);
+			pstmtWrite->setInt64(19, fpInst->sFileInfoInst.sFileCAWTime.i64Time_access);
+			pstmtWrite->setInt(20, fpInst->sFileInfoInst.iChkProjectStatus);
 
+			pstmtWrite->execute();
+			pstmtWrite->close();
+
+			pstmtWrite.reset();
+		}
 		dwErrorCode = GetLastError();
 		throw dwErrorCode;
 	}
@@ -375,7 +464,62 @@ DWORD DBProcess::DBWriteFiles(FileProcess *fpInst)
 		}
 	}
 	return dwErrorCode;
-};
+}
+//DWORD DBProcess::DBCheckProjectsActuallity(FileProcess * fpInst, BOOL & bStatus)
+//{
+//	DWORD dwErrorCode = -1;
+//	std::shared_ptr<sql::PreparedStatement> pstmtGet;
+//	std::shared_ptr<sql::ResultSet> resGet;
+//	int Result = 0;
+//	int iProjectID = 0;
+//	return 0;
+//
+//	// Get from portal.projects
+//	try
+//	{
+//		std::string sFile_ProjectTMP = "";
+//		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectbyName, sFile_ProjectTMP);
+//		sFile_ProjectTMP.append("%");
+//		std::string stMySQLST_Select("SELECT status FROM tablename WHERE field LIKE (?) AND status = 1;");
+//		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableProjects.stMySQLTable_name);
+//		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableProjects.stMySQLTable_fields.at(0));
+//		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
+//		pstmtGet->setString(1, sFile_ProjectTMP);
+//		resGet.reset(pstmtGet->executeQuery());
+//		pstmtGet->close();
+//		while (resGet->next())
+//		{
+//			bStatus = TRUE;
+//			iProjectID = resGet->getInt(1);
+//		};
+//		resGet.reset();
+//		pstmtGet.reset();
+//
+//		dwErrorCode = GetLastError();
+//		throw dwErrorCode;
+//	}
+//	catch (sql::SQLException &e)
+//	{
+//		Logger::GetLogInstance()->PrepareMySQLLOG("Error SELECT status FROM projects", "Function->DBCheckProjectsActuallity(SELECT status FROM projects)", e.what(), e.getErrorCode(), e.getSQLState());
+//		Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCheckProjectsActuallity(SELECT status FROM projects) -> MySQL error: ", e.what(), "MySQL error code: ", e.getErrorCode(), "SQLState: ", e.getSQLState());
+//	}
+//	catch (DWORD Err_code)
+//	{
+//		switch (Err_code)
+//		{
+//		case ERROR_SUCCESS:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCheckProjectsActuallity(SELECT status FROM projects): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
+//			break;
+//		default:
+//			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBCheckProjectsActuallity(SELECT status FROM projects): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
+//			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->DBWriteFiles(SELECT status FROM projects)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
+//			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBCheckProjectsActuallity(SELECT status FROM projects)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+//			break;
+//		}
+//	}
+//	return dwErrorCode;
+//}
+//;
 DWORD DBProcess::DBGetProjects(FileProcess *fpInst, BOOL &bStatus)
 {
 	DWORD dwErrorCode = -1;
@@ -387,13 +531,14 @@ DWORD DBProcess::DBGetProjects(FileProcess *fpInst, BOOL &bStatus)
 	// Get from portal.files
 	try
 	{
-		std::string sFile_ProjectTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectbyName);
+		std::string sFile_ProjectTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectbyName, sFile_ProjectTMP);
 		sFile_ProjectTMP.append("%");
 		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field LIKE (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableProjects.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableProjects.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFile_ProjectTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		pstmtGet->setString(1, sFile_ProjectTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next())
@@ -423,8 +568,10 @@ DWORD DBProcess::DBGetProjects(FileProcess *fpInst, BOOL &bStatus)
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBWriteFiles(SELECT id FROM TABLES): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->DBWriteFiles(SELECT id FROM TABLES)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFiles(SELECT id FROM TABLES)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+			break;
 		}
 	}
+	return dwErrorCode;
 };
 DWORD DBProcess::DBGetCompany(FileProcess *fpInst, BOOL &bStatus)
 {
@@ -437,12 +584,13 @@ DWORD DBProcess::DBGetCompany(FileProcess *fpInst, BOOL &bStatus)
 	// Get from portal.files
 	try
 	{
-		std::string sFile_CompanyTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_CompanybyName);
+		std::string sFile_CompanyTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_CompanybyName, sFile_CompanyTMP);
 		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableCompanies.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableCompanies.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFile_CompanyTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		pstmtGet->setString(1, sFile_CompanyTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next())
@@ -474,6 +622,7 @@ DWORD DBProcess::DBGetCompany(FileProcess *fpInst, BOOL &bStatus)
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFiles(SELECT id FROM TABLES)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
 		}
 	}
+	return dwErrorCode;
 };
 DWORD DBProcess::DBGetRole(FileProcess *fpInst, BOOL &bStatus)
 {
@@ -486,12 +635,13 @@ DWORD DBProcess::DBGetRole(FileProcess *fpInst, BOOL &bStatus)
 	// Get from portal.files
 	try
 	{
-		std::string sFile_RoleTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_RolebyName);
+		std::string sFile_RoleTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_RolebyName, sFile_RoleTMP);
 		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableRole.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableRole.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFile_RoleTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		pstmtGet->setString(1, sFile_RoleTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next())
@@ -521,33 +671,39 @@ DWORD DBProcess::DBGetRole(FileProcess *fpInst, BOOL &bStatus)
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->ChkRoleDB(SELECT * FROM TABLE): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->ChkRoleDB(SELECT * FROM TABLE)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->ChkRoleDB(SELECT * FROM TABLE)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+			break;
 		}
 	}
+	return dwErrorCode;
 };
 DWORD DBProcess::DBGetStage(FileProcess *fpInst, BOOL &bStatus)
 {
 	DWORD dwErrorCode = -1;
 	std::shared_ptr<sql::PreparedStatement> pstmtGet;
 	std::shared_ptr<sql::ResultSet> resGet;
+	fpInst->sFileInfoInst.iChkProjectStatus = -1;
 	int Result = 0;
-	int iStageID = 0;
+	//int iStageID = 0;
 
 	// Get from portal.files
 	try
 	{
-		std::string sFile_StageTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectStageforDB);
-		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field = (?);");
+		std::string sFile_StageTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_ProjectStageforDB, sFile_StageTMP);
+		std::string stMySQLST_Select("SELECT status FROM tablename WHERE field LIKE (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableProjects.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableProjects.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFile_StageTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		sFile_StageTMP.append("%");
+		pstmtGet->setString(1, sFile_StageTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next())
 		{
 			bStatus = TRUE;
-			iStageID = resGet->getInt(1);
+			fpInst->sFileInfoInst.iChkProjectStatus = resGet->getInt(1);
 		};
+
 		resGet.reset();
 		pstmtGet.reset();
 
@@ -570,8 +726,10 @@ DWORD DBProcess::DBGetStage(FileProcess *fpInst, BOOL &bStatus)
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBGetStage(SELECT * FROM TABLE): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->DBGetStage(SELECT * FROM TABLE)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFiles(SELECT * FROM TABLE)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+			break;
 		}
 	}
+	return dwErrorCode;
 };
 DWORD DBProcess::DBGetSubsystem(FileProcess *fpInst, BOOL &bStatus)
 {
@@ -584,12 +742,13 @@ DWORD DBProcess::DBGetSubsystem(FileProcess *fpInst, BOOL &bStatus)
 	// Get from portal.files
 	try
 	{
-		std::string sFile_SubsystemTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_SubsystembyName);
+		std::string sFile_SubsystemTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_SubsystembyName, sFile_SubsystemTMP);
 		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableSubsystem.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableSubsystem.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFile_SubsystemTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		pstmtGet->setString(1, sFile_SubsystemTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next())
@@ -619,8 +778,10 @@ DWORD DBProcess::DBGetSubsystem(FileProcess *fpInst, BOOL &bStatus)
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBWriteFiles(SELECT id FROM TABLES): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->DBWriteFiles(SELECT id FROM TABLES)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFiles(SELECT id FROM TABLES)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+			break;
 		}
 	}
+	return dwErrorCode;
 };
 DWORD DBProcess::DBGetDatatype(FileProcess *fpInst, BOOL &bStatus)
 {
@@ -633,12 +794,13 @@ DWORD DBProcess::DBGetDatatype(FileProcess *fpInst, BOOL &bStatus)
 	// Get from portal.files
 	try
 	{
-		std::string sFile_DatatypeTMP = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_DatatypebyName);
+		std::string sFile_DatatypeTMP = "";
+		dwErrorCode = ConvertStrings::GetConvStrInst()->UnicodeStringToAnsiString(fpInst->sFileInfoInst.sFile_DatatypebyName, sFile_DatatypeTMP);
 		std::string stMySQLST_Select("SELECT * FROM tablename WHERE field = (?);");
 		stMySQLST_Select.replace(stMySQLST_Select.find("tablename"), std::string("tablename").length(), stMySQLTableDatatype.stMySQLTable_name);
 		stMySQLST_Select.replace(stMySQLST_Select.find("field"), std::string("field").length(), stMySQLTableDatatype.stMySQLTable_fields.at(0));
-		pstmtGet.reset(con->prepareStatement(stMySQLST_Select));// extensions_bak extensions
-		pstmtGet->setString(1, sFile_DatatypeTMP);
+		pstmtGet.reset(con->prepareStatement(stMySQLST_Select.c_str()));// extensions_bak extensions
+		pstmtGet->setString(1, sFile_DatatypeTMP.c_str());
 		resGet.reset(pstmtGet->executeQuery());
 		pstmtGet->close();
 		while (resGet->next())
@@ -668,8 +830,10 @@ DWORD DBProcess::DBGetDatatype(FileProcess *fpInst, BOOL &bStatus)
 			Logger::GetLogInstance()->PrepareTXTLOG("Function->DBWriteFiles(SELECT id FROM TABLES): ", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), "Error code: ", dwErrorCode, "; Object: ", fpInst->sFileInfoInst.sFileName);
 			Logger::GetLogInstance()->PrepareMySQLLOG("Error in getting file attributes", "Function->DBWriteFiles(SELECT id FROM TABLES)", ErrorHandle::GetErrorHandleInst()->GetErrorDescription(dwErrorCode), dwErrorCode, fpInst->sFileInfoInst.sFileName);
 			ErrorHandle::GetErrorHandleInst()->ErrorExit(_T("IterObjects->DBWriteFiles(SELECT id FROM TABLES)"), (LPTSTR)&fpInst->sFileInfoInst.sFileName, dwErrorCode);
+			break;
 		}
 	}
+	return dwErrorCode;
 };
 DWORD DBProcess::DBCloseMYSQLConnection()
 {

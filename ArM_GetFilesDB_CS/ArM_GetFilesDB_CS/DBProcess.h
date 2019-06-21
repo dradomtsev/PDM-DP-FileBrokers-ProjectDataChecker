@@ -19,19 +19,24 @@ private:
 		std::vector<std::string> stMySQLTable_fields;
 	}stMySQLTableErrors, stMySQLTableExtens, stMySQLTableFiles, stMySQLTableFolders, stMySQLTableUsers, stMySQLTableProjects, stMySQLTableCompanies, stMySQLTableRole, stMySQLTableSubsystem, stMySQLTableDatatype;
 protected:
-
 	sql::Driver *driver;
 	std::shared_ptr<sql::Connection> con;
 public:
 	friend class FileProcess;
 	friend class Logger;
 
-	static  DBProcess* dbProcInstance	();
+	static  DBProcess& dbProcInstance()
+	{
+		static DBProcess dbProcInst;
+		return dbProcInst;
+	};
+
 	DWORD DBCreateMYSQLConnection		();
 	DWORD DBInitTables					();
 	DWORD DBWriteFolders				(FileProcess *fpInst);
 	DWORD DBWriteExtensions				(FileProcess *fpInst);
 	DWORD DBWriteFiles					(FileProcess *fpInst);
+	//DWORD DBCheckProjectsActuallity		(FileProcess *fpInst, BOOL &bStatus);
 	DWORD DBGetProjects					(FileProcess *fpInst, BOOL &bStatus);
 	DWORD DBGetCompany					(FileProcess *fpInst, BOOL &bStatus);
 	DWORD DBGetRole						(FileProcess *fpInst, BOOL &bStatus);

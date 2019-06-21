@@ -5,10 +5,8 @@ class FileProcess
 {
 private:
 
-	SYSTEMTIME	curSysTime;
-	FILETIME	curFileTime;
-	FILETIME	tStartChkPeriod;
-	FILETIME	tEndChkPeriod;
+protected:
+public:
 	struct FileCAWTime
 	{
 		INT64 i64Time_create, i64Time_access, i64Time_write;
@@ -33,58 +31,76 @@ private:
 		std::basic_string<TCHAR> sFile_StagebyPath;
 		std::basic_string<TCHAR> sFile_SubsystembyName;
 		std::basic_string<TCHAR> sFile_DatatypebyName;
-		INT iChkMask		= -1;
-		INT iChkCyrillic	= -1;
-		INT iChkProjectDB	= -1;
-		INT iChkProjectDR	= -1;
-		INT iChk—ompanyDB	= -1;
-		INT iChkRoleDB		= -1;
-		INT iChkStageDB		= -1;
-		INT iChkStageDR		= -1;
-		INT iChkSubSystemDB = -1;
-		INT iChkDataTypeDB	= -1;
-		LARGE_INTEGER sFileSize;
-		std::string sNumberofLinks;
-		FileCAWTime sFileCAWTime;
-	} sFileInfoInst;
+		std::basic_string<TCHAR> sFile_BuildingSection;
+		//std::basic_string<TCHAR> sFile_Role;
+
+		INT iChkMask				= -1;
+		INT iChkCyrillic			= -1;
+		INT iChkProjectDB			= -1;
+		INT iChkProjectDR			= -1;
+		INT iChk—ompanyDB			= -1;
+		INT iChkRoleDB				= -1;
+		INT iChkStageDB				= -1;
+		INT iChkStageDR				= -1;
+		INT iChkSubSystemDB			= -1;
+		INT iChkDataTypeDB			= -1;
+		INT iChkProjectStatus		= -1;
+		INT iChkBuildingSection		= -1;
+		LARGE_INTEGER sFileSize		= { 0 };
+		FileCAWTime sFileCAWTime	= { 0 };
+	};
+	FileInfo sFileInfoInst;
 	std::basic_string <char>::size_type iIndex;
 	std::basic_string <char>::size_type npos;
 	std::vector<std::basic_string<TCHAR>> vstExistExtens;
 	std::vector<std::basic_string<TCHAR>> vstExistDirs;
-	std::vector<std::basic_string<TCHAR>> vstExistDirsRoot;
-	std::basic_string<TCHAR> stDirPathforNameCheck;
-protected:
-public:
+	SYSTEMTIME	curSysTime;
+	FILETIME	curFileTime;
+	//std::basic_regex<TCHAR> regFindDStageShaPubZZ;
+	//std::basic_regex<TCHAR> regMaskDStageShaPubZZ;
+	//std::basic_regex<TCHAR> regMaskDCompanyShaPubZZ;
+	//std::basic_regex<TCHAR> regMaskCommon;
+	//std::basic_regex<TCHAR> regMaskCyrillic;
+	//std::basic_regex<TCHAR> regMaskCompany;
+	//std::basic_regex<TCHAR> regMaskRole;
+	//std::basic_regex<TCHAR> regMaskStage;
+	std::basic_regex<TCHAR> stRegFileStructbyMask;
+	std::basic_regex<TCHAR> stRegRoleMask;
+	std::basic_regex<TCHAR> stOfficeOwnerFileMask;
 	//friend class UI;
 	friend class DBProcess;
 
 	FileProcess();
 	~FileProcess();
-
-	DWORD InitReviewPeriod		();
-
-	DWORD StartMySQLConect		();
-	DWORD InitMySQLConect		();
-	DWORD CloseMySQLConect		();
 	
 	DWORD IterDirs				(std::basic_string<TCHAR> stWorkDir);
-	DWORD IterObjects			(std::basic_string<TCHAR> twrkDir, std::basic_string<TCHAR> twrkDirName, int iCounter);
+	DWORD IterObjects			(std::basic_string<TCHAR> twrkDir,const std::basic_string<TCHAR> twrkDirName, int iCounter);
 	DWORD IterProcessFiles		(HANDLE hFileDataFindFirst, std::basic_string<TCHAR> twrkDirtemp, std::basic_string<TCHAR> twrkDirName);
 
 	DWORD GetFileOwnerName		(HANDLE hFile, std::basic_string<TCHAR> sFileName);
 	DWORD GetFileSizeInst		(HANDLE hFile);
 	DWORD GetFileCAWTime		(HANDLE hFile);
-	DWORD GetFileInfobyName		();
-	DWORD GetFileInfobyFolder	();
 	DWORD ChangeFolderView		();
-	DWORD ChkMask				(std::basic_string<TCHAR> sFileName);
-	DWORD ChkCyrillic			(std::basic_string<TCHAR> sFileName);
+	DWORD GetFileInfobyFolder	();
+	DWORD ChkCyrillic			();
 	DWORD ChkProjectDB			();
 	DWORD ChkProjectDR			();
-	DWORD Chk—ompanyDB			();
-	DWORD ChkRoleDB				();
-	DWORD ChkStageDB			();
-	DWORD ChkStageDR			();
-	DWORD ChkSubSystemDB		();
-	DWORD ChkDataTypeDB			();
+	
+
+	DWORD GetFileInfobyName_fns3();
+	DWORD ChkMask_fns3			();
+	DWORD ChkStageDB_fns3		();
+	DWORD ChkStageDR_fns3		();
+	DWORD ChkBuildingSection_fns3();
+	DWORD ChkRoleDB_fns3		();
+	DWORD ChkSubSystemDB_fns3	();
+
+	DWORD GetFileInfobyName_fns2();
+	DWORD ChkMask_fns2			();
+	DWORD Chk—ompanyDB_fns2		();
+	DWORD ChkStageDB_fns2		();
+	DWORD ChkStageDR_fns2		();
+	DWORD ChkRoleDB_fns2		();
+	DWORD ChkSubSystemDB_fns2	();
+	DWORD ChkDataTypeDB_fns2	();
 };
