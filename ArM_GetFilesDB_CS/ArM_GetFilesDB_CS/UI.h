@@ -39,6 +39,7 @@ public:
 	std::vector<std::basic_string<TCHAR>> vstFolderstoParse;
 	std::vector<std::basic_string<TCHAR>>::iterator itFolderstoParse;
 	std::vector<std::basic_string<TCHAR>> vstFolderstoIgnore;
+	std::vector<std::basic_string<TCHAR>> vstFilestoIgnore;
 	std::basic_string<TCHAR> stChkStartDateTime;
 	std::basic_string<TCHAR> stChkEndDateTime;
 	std::vector<std::basic_string<TCHAR>> vstChkStartDateTime;

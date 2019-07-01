@@ -169,12 +169,15 @@ DWORD UI::InitbyINI()
 		std::string sJSONPath;
 		ConvertStrings::GetConvStrInst()->ws2s(stCurDirBuff, sJSONPath);
 		boost::property_tree::wiptree wpt;
-		boost::property_tree::read_json(sJSONPath, wpt);
+		const std::locale loc = std::locale("en_US.UTF-8");
+		boost::property_tree::read_json(sJSONPath, wpt, loc);
 
 		for (const boost::property_tree::wiptree::value_type &ptVV : wpt.get_child	(_T("DataStructure.FoldersToRead")))
 			vstFolderstoParse.push_back(ptVV.second.data());
 		for (const boost::property_tree::wiptree::value_type &ptVV : wpt.get_child	(_T("DataStructure.FoldersIgnore")))
 			vstFolderstoIgnore.push_back(ptVV.second.data());
+		for (const boost::property_tree::wiptree::value_type &ptVV : wpt.get_child	(_T("DataStructure.FilesIgnore")))
+			vstFilestoIgnore.push_back(ptVV.second.data());
 		for (const boost::property_tree::wiptree::value_type &ptVV : wpt.get_child	(_T("DataStructure.RootFolders")))
 			vstRootFolders.push_back(ptVV.second.data());
 		stChkStartDateTime.	append(wpt.get<std::basic_string<TCHAR>>				(_T("Timing.ChkStartDateTime")));
