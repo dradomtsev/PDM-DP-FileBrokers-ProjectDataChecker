@@ -281,7 +281,7 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 						continue;
 				int iDirStatus = 0;
 				tstTempString_Left = this->sFileInfoInst.sFileName;
-				for (std::vector<std::basic_string<TCHAR>>::iterator it = UI::GetUIInst().vstFolderstoIgnore.begin(); it != UI::GetUIInst().vstFolderstoIgnore.end(); ++it)
+				for (std::vector<std::basic_string<TCHAR>>::iterator it = UI::GetUIInst().vstFilestoIgnore.begin(); it != UI::GetUIInst().vstFilestoIgnore.end(); ++it)
 				{
 					tstTempString_Right = it->c_str();
 					std::transform(tstTempString_Left.begin(), tstTempString_Left.end(), tstTempString_Left.begin(), ::towlower);
@@ -298,7 +298,7 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 					{
 						tstTempString_Right.clear();
 						iDirStatus = -1;
-						break;
+						//break;
 					}
 				}
 				tstTempString_Left.clear();
@@ -332,7 +332,7 @@ DWORD FileProcess::IterObjects(std::basic_string<TCHAR> twrkDir,const std::basic
 					//}
 				}
 				else
-					break;
+					continue;
 			}
 		} while (FindNextFile(hFileDataFindFirst, &fdFileData) != 0);
 
