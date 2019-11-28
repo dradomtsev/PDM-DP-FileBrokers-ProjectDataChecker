@@ -486,16 +486,18 @@ DWORD FileProcess::IterProcessFiles(HANDLE hFileDataFindFirst, std::basic_string
 			dwErrorCode = this->GetFileCAWTime(hFile);
 			dwErrorCode = this->ChangeFolderView();
 			
-			this->sFileInfoInst.iChkMask		= -1;
-			this->sFileInfoInst.iChkCyrillic	= -1;
-			this->sFileInfoInst.iChkProjectDB	= -1;
-			this->sFileInfoInst.iChkProjectDR	= -1;
-			this->sFileInfoInst.iChkÑompanyDB	= -1;
-			this->sFileInfoInst.iChkRoleDB		= -1;
-			this->sFileInfoInst.iChkStageDB		= -1;
-			this->sFileInfoInst.iChkStageDR		= -1;
-			this->sFileInfoInst.iChkSubSystemDB = -1;
-			this->sFileInfoInst.iChkDataTypeDB	= -1;
+			this->sFileInfoInst.iChkMask		= 0;
+			this->sFileInfoInst.iChkCyrillic	= 0;
+			this->sFileInfoInst.iChkProjectDB	= 0;
+			this->sFileInfoInst.iChkProjectDR	= 0;
+			this->sFileInfoInst.iChkÑompanyDB	= 0;
+			this->sFileInfoInst.iChkRoleDB		= 0;
+			this->sFileInfoInst.iChkStageDB		= 0;
+			this->sFileInfoInst.iChkStageDR		= 0;
+			this->sFileInfoInst.iChkSubSystemDB = 0;
+			this->sFileInfoInst.iChkDataTypeDB	= 0;
+			this->sFileInfoInst.iChkBuildingSection = 0;
+			this->sFileInfoInst.iChkProjectStatus = 0;
 
 			std::match_results<std::basic_string<TCHAR>::const_iterator> mrSearchresult;
 			

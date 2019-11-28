@@ -3,29 +3,44 @@
     {
         "FoldersToRead":
         [
-            "W:\\!TST"
+            "W:"
         ],
         "FoldersIgnore":
         [
             "00-Inc","04-Arc","99-Del","AC","#ASu","1BIM","1PRM","#ABD","#Res","#Rep","#Pre",
-            "_delete","_versions","Вулкан","Теремки","_Визитки","_Организация","_ПИСЬМА",
-            "Архивные Папки Здесь","Удаленные Папки Здесь","TMP","TST","temp","Sketches","Slab",
-            "Calculation","ScreenShots","ScreenShots","Modules","SoftWare","Photofi","CENTRAL"
+            "_delete","_versions","TMP","temp","Sketches","Slab","Drawings",
+            "Calculation","ScreenShots","ScreenShots","Modules","SoftWare","Photofi","CENTRAL","TST",
+            "\u0412\u0443\u043b\u043a\u0430\u043d",
+            "\u0422\u0435\u0440\u0435\u043c\u043a\u0438",
+            "\u005f\u0412\u0438\u0437\u0438\u0442\u043a\u0438",
+            "\u005f\u041e\u0440\u0433\u0430\u043d\u0438\u0437\u0430\u0446\u0438\u044f",
+            "\u005f\u041f\u0418\u0421\u042c\u041c\u0410",
+            "\u0410\u0440\u0445\u0438\u0432\u043d\u044b\u0435 \u041f\u0430\u043f\u043a\u0438 \u0417\u0434\u0435\u0441\u044c",
+            "\u0423\u0434\u0430\u043b\u0435\u043d\u043d\u044b\u0435 \u041f\u0430\u043f\u043a\u0438 \u0417\u0434\u0435\u0441\u044c"
         ],
         "RootFolders":
         [
             "P:","R:","S:","W:","03-Published","Resources","02-Shared","01-WorkInProgress"       
+        ],
+        "FilesIgnore":
+        [
+            ".dwl","CENTRAL"
         ]
     },
     "Timing":
     {
-        "ChkStartDateTime":"2018:01:01:00:00:00",
+        "ChkStartDateTime":"2019:11:01:00:00:00",
         "ChkEndDateTime":"%YYYY:MM:DD:HH:MM:SS%"
     },
     "FileNamingSystem":
     {
+        "Properties":
+        {
+            "CheckFileNaming":"true"
+        },
         "FNS2":
         {
+
             "Projects":
             {
                 "Include":[],
@@ -36,10 +51,12 @@
                 "Common":
                 {
                     "FileMask":"\\w+\\-[\\[\\(]\\w+[\\]\\)]\\w+-[\\[\\(]\\w+[\\]\\)][\\w&%]*-[\\w&%]*-\\w+.+",
-                    "Cyrillic":"[А-Яа-яЁёїЇіІ]",
+                    "Cyrillic":"[\u0400-\u04FF]",
                     "Company":"[\\[\\(](\\w+)[\\]\\)]\\w+",
                     "Role":"[\\[\\(]\\w+[\\]\\)](\\w+)",
-                    "Stage":"[\\[\\(](\\w+)[\\]\\)].*"
+                    "Stage":"[\\[\\(](\\w+)[\\]\\)].*",
+                    "BuildingSection":"",
+                    "SubSystem":""
                 },
                 "Specific":
                 {
@@ -55,7 +72,7 @@
             {
                 "Include":
                 [
-                    "OBL", "DHT", "VZD", "VTK", "SML", "ARC", "LZR", "UNC-C"
+                    "OBL", "ORL", "DHT", "VZD", "VTK", "SML", "ARC", "LZR", "UNC-C", "UNC-D01C", "VES", "KSN", "PLV", "LkB-C01"
                 ],
                 "Exclude":[]
             },
@@ -63,11 +80,14 @@
             {
                 "Common":
                 {
-                    "FileMask":"",
-                    "Cyrillic":"",
+                    "FileMask":"^\\w+-\\w+-\\w+-\\w+-\\w+((-|\\.)[^\\r\\n\\t\\f\\v]+)?",
+                    "Cyrillic":"[\u0400-\u04FF]",
+                    "Project":"[A-Z]{3}",
                     "Company":"",
-                    "Role":"",
-                    "Stage":""
+                    "Role":"[A-Z]{1,4}",
+                    "Stage":"[A-Z]{1}\\d{2}(\\w)?",
+                    "BuildingSection":"\\w{3,5}",
+                    "SubSystem":"[A-Z0-9]{1,5}"
                 },
                 "Specific":
                 {
@@ -82,10 +102,10 @@
     {
         "Connection":
         {
-            "HostnamePort":"tcp://192.168.1.250:3306",
-            "Login":"d.radomtsev",
-            "Password":"TA7qpAZf",
-            "DefaultSchema":"test_database"
+            "HostnamePort":"tcp://127.0.0.1:3306",
+            "Login":"root",
+            "Password":"MyNewPass",
+            "DefaultSchema":"filechecking-dev"
         },
         "Tables":
         {
@@ -112,7 +132,7 @@
                 [
                     "name","extension_id","folder_id","user_id","size","mask_match","has_no_cyrilic",
                     "project_exists","project_match","company_exists","role_exists","stage_match",
-                    "project_with_stage_match","subsystem_exists","datatype_exists",
+                    "project_with_stage_match","subsystem_exists","datatype_exists", "buildingsection_match",
                     "created_at","updated_at","accessed_at","project_status"
                 ]
             },
