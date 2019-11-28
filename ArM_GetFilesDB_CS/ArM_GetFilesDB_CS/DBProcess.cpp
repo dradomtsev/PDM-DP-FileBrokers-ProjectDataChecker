@@ -123,9 +123,18 @@ DWORD DBProcess::DBCreateMYSQLConnection()
 	try
 	{
 		std::shared_ptr<sql::Statement> stmt;
+		/*sql::ConnectOptionsMap connection_properties;
+		connection_properties["hostName"] = this->MySQLConnectionInst.stTCIP.c_str();
+		connection_properties["userName"] = this->MySQLConnectionInst.stLogin.c_str();
+		connection_properties["password"] = this->MySQLConnectionInst.stPassword.c_str();
+		connection_properties["schema"] = this->MySQLConnectionInst.stSchemaName.c_str();
+		connection_properties["port"] = 13306;
+		connection_properties["OPT_RECONNECT"] = true;*/
 
 		driver = sql::mysql::get_mysql_driver_instance();
-		con.reset(driver->connect(this->MySQLConnectionInst.stTCIP.c_str(), this->MySQLConnectionInst.stLogin.c_str(), this->MySQLConnectionInst.stPassword.c_str() ));
+
+		con.reset(driver->connect(this->MySQLConnectionInst.stTCIP.c_str(), this->MySQLConnectionInst.stLogin.c_str(), this->MySQLConnectionInst.stPassword.c_str()));
+		//con.reset(driver->connect(this->MySQLConnectionInst.stTCIP.c_str(), this->MySQLConnectionInst.stLogin.c_str(), this->MySQLConnectionInst.stPassword.c_str() ));
 		con->setSchema(this->MySQLConnectionInst.stSchemaName.c_str());
 		std::string stMySQL_UseSchema;
 		stMySQL_UseSchema = "USE `" + this->MySQLConnectionInst.stSchemaName + "`;";
